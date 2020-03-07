@@ -16,4 +16,11 @@ class A {
 
 addContent()
 
-require('./index.scss')
+require('./css/index.scss')
+
+import img from "./imgs/timg.jpg"
+let image = new Image()
+image.src = img
+document.body.appendChild(image)
+
+console.log("8888888888");

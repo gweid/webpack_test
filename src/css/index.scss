@@ -1,0 +1,23 @@
+body {
+    background-color: green;
+}
+html {
+    background-color: pink;
+}
+
+.name {
+    color: blue;
+}
+
+.transform-rotate {
+    width: 100px;
+    height: 100px;
+    transform: rotate(45deg);
+    background-color: red;
+}
+
+.bgc-img {
+    width: 700px;
+    height: 800px;;
+    background-image: url('../imgs/timg.jpg');
+}
