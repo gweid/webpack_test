@@ -74,6 +74,15 @@ module.exports = {
         //     }
         // }, // 配置代理
 
+        // 前端模拟数据
+        before(app) {
+            app.get('/api/user', (req, res) => {
+                res.json({
+                    name: "你好啊"
+                })
+            })
+        },
+
         hot: true, // 配合开启 HMR, 这个必须开启
         open: true, // 自动打开浏览器
     },
