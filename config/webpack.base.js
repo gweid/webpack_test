@@ -186,77 +186,11 @@ module.exports = {
         new webpack.NamedModulesPlugin(), // 用于启动 HMR 时可以显示模块的相对路径
         new webpack.HotModuleReplacementPlugin(), // Hot Module Replacement 的插件
 
-        // 在打包之前，可以删除dist文件夹下的所有内容
-        new CleanWebpackPlugin(),
-
-        // 打包时去掉 console 打印、debugger 调试( webpack4 之后不能这样子用，4 以后移除了该方法, 用 minimize )
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         warnings: false,
-        //         drop_debugger: true,
-        //         drop_console: true
-        //     }
-        // }),
-
         // 抽离 css 注意
         new MiniCssExtractPlugin({
             filename: 'css/index.css', // 分离到 dist/css/
         }),
-
-        // 打包显示进度条
-        new ProgressBarWebpackPlugin(),
-
-        // 去除无用样式
-        // new PurgecssWebpackPlugin({
-        //     // glob: 同步查找 src 目录下的任意文件夹下的任意文件,返回一个数组，如['真实路径 /src/css/style.css','真实路径 /src/index.js',...]
-        //     // paths 表示指定要去解析的文件名数组路径
-        //     // Purgecss 会去解析这些文件然后把无用的样式移除
-        //     paths: glob.sync("./src/**/*", {
-        //         nodir: true
-        //     })
-        // }),
-
-        // 动态引入 CDN
-        // new htmlWebpackExternalsPlugin({
-        //     externals: [{
-        //         module: 'vue',
-        //         entry: "https://cdn.bootcss.com/vue/2.6.10/vue.min.js",
-        //         global: 'Vue'
-        //     }]
-        // })
     ],
-
-    // 优化项(这些配置需要在环境是 production 中才生效)
-    optimization: {
-        minimizer: [
-            // uglifyjs-webpack-plugin 进行 js 压缩
-            new UglifyJsPlugin({
-                cache: true, // 开启缓存
-                parallel: true, // 开启多核编译
-            }),
-            // 打包时去除 console
-            new TerserPlugin({
-                minify: (file, sourceMap) => {
-                    // https://github.com/mishoo/UglifyJS2#minify-options
-                    const uglifyJsOptions = {
-                        /* your `uglify-js` package options */
-                        compress: {
-                            drop_console: true
-                        }
-                    };
-
-                    if (sourceMap) {
-                        uglifyJsOptions.sourceMap = {
-                            content: sourceMap,
-                        };
-                    }
-
-                    return require('uglify-js').minify(file, uglifyJsOptions);
-                },
-            }),
-            new OptimizeCSSAssetsPlugin()
-        ]
-    },
 
     // resolve.alias 配置文件别名，省去编写相对路径麻烦
     resolve: {
