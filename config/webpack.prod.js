@@ -43,9 +43,7 @@ module.exports = smart(base, {
             hash: true, // 加 hash 解决缓存问题
         }),
 
-        // HMR,模块热替换，能局部替换，节省性能
-        new webpack.NamedModulesPlugin(), // 用于启动 HMR 时可以显示模块的相对路径
-        new webpack.HotModuleReplacementPlugin(), // Hot Module Replacement 的插件
+
 
         // 在打包之前，可以删除dist文件夹下的所有内容
         new CleanWebpackPlugin(),
