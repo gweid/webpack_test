@@ -1,18 +1,19 @@
 const os = require('os')
 const path = require("path")
 const webpack = require('webpack')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin') // webpack 4 已经不推荐使用 uglifyjs-webpack-plugin，而是用 terser-webpack-plugin
+const TerserPlugin = require('terser-webpack-plugin') // webpack4 之后使用这个在打包时移除 console.log
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 抽离 css
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin') // webpack4 之后使用这个在打包时移除 console.log
+
 const ProgressBarWebpackPlugin = require('progress-bar-webpack-plugin') // 打包显示进度条
 // const CleanWebpackPlugin = require('clean-webpack-plugin');
 const {
     CleanWebpackPlugin
 } = require('clean-webpack-plugin'); // webpack4 以后的版本需要这样引入
 
-const HappyPack = require('happypack')
+const HappyPack = require('happypack') // webpack 4 不推荐使用 happypack，而是使用 thread-loader
 // 获取 cpu 进程
 const happyThreadPool = HappyPack.ThreadPool({
     size: os.cpus().length
@@ -179,7 +180,7 @@ module.exports = {
 
         // 定义全局常量
         new webpack.DefinePlugin({
-            ENV: JSON.stringify('dev')  
+            ENV: JSON.stringify('dev')
         }),
 
         // HMR,模块热替换，能局部替换，节省性能
@@ -229,13 +230,15 @@ module.exports = {
     // 优化项(这些配置需要在环境是 production 中才生效)
     optimization: {
         minimizer: [
-            // uglifyjs-webpack-plugin 进行 js 压缩
-            new UglifyJsPlugin({
-                cache: true, // 开启缓存
-                parallel: true, // 开启多核编译
-            }),
-            // 打包时去除 console
+            // uglifyjs-webpack-plugin 进行 js 压缩(注意: webpack 4 已经不推荐使用)
+            // new UglifyJsPlugin({
+            //     cache: true, // 开启缓存
+            //     parallel: true, // 开启多核编译
+            // }),
+            // 打包时去除 console  terser-webpack-plugin 压缩
             new TerserPlugin({
+                cache: true, // 是否缓存
+                parallel: true, // 开启多核编译,
                 minify: (file, sourceMap) => {
                     // https://github.com/mishoo/UglifyJS2#minify-options
                     const uglifyJsOptions = {
