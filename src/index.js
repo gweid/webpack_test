@@ -34,3 +34,5 @@ xhr.onreadystatechange = function() {
         console.log(xhr.responseText);
     }
 }
+
+

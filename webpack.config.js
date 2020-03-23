@@ -52,7 +52,7 @@ module.exports = {
         // publicPath: "http://cdn/com/", // 可以配置 cdn
     },
 
-    mode: "development", // mode 为 development 时，webpack-dev-server 具备热重载功能, 两种模式 production development
+    mode: 'development', // mode 为 development 时，webpack-dev-server 具备热重载功能, 两种模式 production development
 
     // devtool 源码映射, 主要是报错时能指出哪里报错了
     // devtoll: 'none', // 在开发者模式下，默认开启 sourcemap, 将其关闭
