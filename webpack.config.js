@@ -50,11 +50,14 @@ module.exports = (env, options) => {
           ? 'js/bundle.[hash:8].js'
           : 'js/bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
       path: path.resolve(__dirname, 'dist'), // 全局路径
-      publicPath: MODE === 'development' ? '/dist/' : '', // 所有资源引入公共路径前缀
+      publicPath: MODE === 'development' ? '' : '', // 所有资源引入公共路径前缀
+      chunkFilename: 'js/[name]_chunk.js', // 对非入口的 chunk 命名
+      // library: '[name]', // 整个库向外暴露的名字
+      // libraryTargrt: 'window', // 变量名添加到什么属性上
     },
 
     devServer: {
-      publicPath: '/dist/',
+      publicPath: '',
       // 要运行的目录 只是在内存中编译打包，不指向真正的目录
       contentBase: path.resolve(__dirname, 'dist'),
       compress: true, // 启动 gzip 压缩
