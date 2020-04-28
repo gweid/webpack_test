@@ -1,5 +1,5 @@
-import '../css/index.css'
-import '../css/index.scss'
+import '@css/index.css'
+import '@css/index.scss'
 
 import hello from './hello'
 import $ from "jquery"

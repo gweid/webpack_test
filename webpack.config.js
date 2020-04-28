@@ -94,6 +94,15 @@ module.exports = (env, options) => {
     //     jquery: "jQuery"
     // },
 
+    // 解释模块的规则
+    resolve: {
+      // 配置文件别名
+      // 优点： 减少打包时查找文件的时间
+      alias: {
+        '@css': path.resolve(__dirname, 'src/css'),
+      },
+    },
+
     module: {
       rules: [
         {
