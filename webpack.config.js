@@ -7,6 +7,7 @@ const WorkboxWebpackPlugin = require('workbox-webpack-plugin') // pwa
 const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin') // 动态使用 cdn
 const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 // const AutodllWebpackPlugin = require('autodll-webpack-plugin')
+const TerserWebpackPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
 
 // css 公共配置
@@ -260,7 +261,29 @@ module.exports = (env, options) => {
       // 代码分割
       splitChunks: {
         chunks: 'all',
+        minSize: 30 * 1024, // 只有大于 30kb 的 chunks 才进行分割
+        minChunks: 1, // 这个 chunks 至少被引用一次才分割
       },
+      // 解决代码分割缓存失败
+      // runtimeChunk: {
+      //   name: (entrypoint) => `runtime-${entrypoint.name}`,
+      // },
+
+      // 配置生产环境的压缩方案
+      minimizer: [
+        new TerserWebpackPlugin({
+          cache: true, // 开启缓存
+          parallel: true, // 开启多进程打包
+          // sourceMap: true, // 启动 source-map
+
+          // 去除 console.log 
+          // terserOptions: {
+          //   compress: {
+          //     drop_console: true,
+          //   },
+          // },
+        }),
+      ],
     },
   }
 }

@@ -14,7 +14,7 @@ console.log(zepto);
 hello()
 
 function test() {
-  return 'test'
+  return 'test huancun'
 }
 console.log(console.log(test()))
 
@@ -23,7 +23,7 @@ const add = (x, y) => {
 }
 console.log(add(1, 51))
 
-const arr = [1, 2, 3, 4]
+const arr = [1, 2, 3]
 console.log(arr.includes(1))
 
 class Person {
@@ -34,7 +34,7 @@ class Person {
     console.log(this.name)
   }
 }
-const person = new Person('jack')
+const person = new Person('jacklusy')
 person.getName()
 
 const btn = document.querySelector('#btn')
@@ -49,7 +49,7 @@ btn.addEventListener('click', (e) => {
   //   console.log(addSub(1, 7))
   // })
 
-  // 预加载
+  // 预加载  webpackPrefetch: true
   import( /* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(
     ({
       addSub

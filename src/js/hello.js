@@ -1,8 +1,8 @@
-console.log("hello.js 执行了");
+console.log("hello.js 执行了11111");
 
 
 function hello() {
-    console.log("helle qilixiang");
+    console.log("helle 哈哈哈哈哈哈");
 
 }
 
