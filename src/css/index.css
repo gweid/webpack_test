@@ -1,18 +1,49 @@
+html,
 body {
-    background-color: pink;
+    background-color: #f5f5f5;
 }
 
-html {
-    background-color: pink;
+p {
+    font-size: 30px;
+    color: #000;
 }
 
-.name {
-    color: blue;
+.img>p {
+    width: 200px;
+    height: 200px;
 }
 
-.transform-rotate {
-    width: 100px;
-    height: 100px;
-    transform: rotate(45deg);
+.img1 {
+    background-image: url("../images//vue.jpg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.img2 {
+    background-image: url("../images/react.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.img3 {
+    background-image: url("../images/angular.jpg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.set-image {
+    display: flex;
+}
+
+.liner-box {
+    margin-left: 50px;
+    margin-top: 80px;
+    width: 200px;
+    height: 200px;
     background-color: red;
+    transform: rotate(45deg);
+}
+
+#btn {
+    margin-top: 80px;
 }
