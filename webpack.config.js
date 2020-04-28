@@ -274,7 +274,7 @@ module.exports = (env, options) => {
         new TerserWebpackPlugin({
           cache: true, // 开启缓存
           parallel: true, // 开启多进程打包
-          // sourceMap: true, // 启动 source-map
+          // sourceMap: true, // 启动 source-map, 如果生产生产环境要 source-map，打开，不然内联的 source-map 可能会被压缩掉
 
           // 去除 console.log 
           // terserOptions: {
