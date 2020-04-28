@@ -57,14 +57,32 @@ module.exports = (env, options) => {
     },
 
     devServer: {
-      publicPath: '',
+      publicPath: '', // 所有资源引入公共路径前缀
       // 要运行的目录 只是在内存中编译打包，不指向真正的目录
       contentBase: path.resolve(__dirname, 'dist'),
+      watchOptions: {
+        // 忽略 node_modules
+        ignored: /node_modules/,
+      },
       compress: true, // 启动 gzip 压缩
       // progress: true, // 显示进度条
       port: 3000,
       open: true,
       hot: true, // 打开 HMR 模块热替换
+      clientLogLevel: 'none', // 不显示启动服务器日志信息
+      quiet: true, // 除了一些基本启动信息，其他的内容不要显示
+
+      // 服务器代理 ---> 解决开发环境中的跨域问题
+      proxy: {
+        'api/': {
+          // 一旦 devServer 接收到 /api/xx 形式的请求，就会把请求转发到 http://localhost:3000
+          targrt: 'http://localhost:3000',
+          // 发送请求时，路径重写：将 /api/xxx ---> /xxx
+          pathRewrite: {
+            '^/api': '',
+          },
+        },
+      },
     },
 
     // source-map 源码映射
