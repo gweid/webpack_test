@@ -554,3 +554,12 @@ plugins: [
     }),
 ]
 ```
+
+
+# 优化体验
+#### 打包构建显示进度条
+```
+package.json 启动命令行加 --progress
+
+"build": "webpack --mode production --progress",
+```

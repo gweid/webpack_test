@@ -4,9 +4,9 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "webpack-dev-server --mode development",
-        "build": "webpack --mode production",
-        "dll": "webpack --config webpack.dll.config.js --mode production"
+        "dev": "webpack-dev-server --mode development --progress",
+        "build": "webpack --mode production --progress",
+        "dll": "webpack --config webpack.dll.config.js --mode production --progress"
     },
     "author": "",
     "license": "ISC",
