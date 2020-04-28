@@ -389,6 +389,54 @@ npm i thread-loader -D
 'thread-loader',
 ```
 
+#### d、动态链接库 dll
+
+-   主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
+
+```
+// 新建 webpack.dll.config.js, 并且在 package.json 配置 dll 启动命令   "dll": "webpack --config webpack.dll.config.js --mode production"
+
+// webpack.dll.config.js
+const path = require('path')
+const webpack = require('webpack')
+const {
+    CleanWebpackPlugin
+} = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
+
+module.exports = {
+    entry: {
+        zepto: ['zepto-webpack']
+    },
+    output: {
+        filename: "[name].dll.js",
+        path: path.resolve(__dirname, "dll"),
+        library: "dll_[name]"
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+
+        new webpack.DllPlugin({
+            name: 'dll_[name]',
+            path: path.resolve(__dirname, "dll", "[name].manifest.json")
+        })
+    ]
+}
+
+// webpa|ck.config.js 中使用
+npm i add-asset-html-webpack-plugin -D
+
+plugins: [
+    // 使用 dll
+    new webpack.DllReferencePlugin({
+        manifest: path.resolve(__dirname, "dll", "zepto.manifest.json")
+    }),
+    // 通过这样引入 dll 后的第三方库
+    new AddAssetHtmlWebpackPlugin({
+        filepath: path.resolve(__dirname, "dll", "zepto.dll.js")
+    }),
+]
+```
+
 ### 2、优化代码运行性能
 
 #### a、文件资源缓存
@@ -504,54 +552,6 @@ plugins: [
             global: "jQuery"
         }]
     })
-]
-```
-
-#### g、动态链接库 .dll
-
--   主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
-
-```
-// 新建 webpack.dll.config.js, 并且在 package.json 配置 dll 启动命令   "dll": "webpack --config webpack.dll.config.js --mode production"
-
-// webpack.dll.config.js
-const path = require('path')
-const webpack = require('webpack')
-const {
-    CleanWebpackPlugin
-} = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
-
-module.exports = {
-    entry: {
-        zepto: ['zepto-webpack']
-    },
-    output: {
-        filename: "[name].dll.js",
-        path: path.resolve(__dirname, "dll"),
-        library: "dll_[name]"
-    },
-    plugins: [
-        new CleanWebpackPlugin(),
-
-        new webpack.DllPlugin({
-            name: 'dll_[name]',
-            path: path.resolve(__dirname, "dll", "[name].manifest.json")
-        })
-    ]
-}
-
-// webpa|ck.config.js 中使用
-npm i add-asset-html-webpack-plugin -D
-
-plugins: [
-    // 使用 dll
-    new webpack.DllReferencePlugin({
-        manifest: path.resolve(__dirname, "dll", "zepto.manifest.json")
-    }),
-    // 通过这样引入 dll 后的第三方库
-    new AddAssetHtmlWebpackPlugin({
-        filepath: path.resolve(__dirname, "dll", "zepto.dll.js")
-    }),
 ]
 ```
 
