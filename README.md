@@ -37,7 +37,7 @@ npm i style-loader css-loader sass-loader node-sass -D
 
 #### 3、图片 loader
 
-- 依赖 file-loader url-loader
+-   依赖 file-loader url-loader
 
 ```
 npm i file-loader url-loader -D
@@ -109,7 +109,7 @@ plugins: [
 
 #### 8、抽离 css
 
-- 注意：抽离 css 需要配置一下 miniCssExtractPlugin 的 publicPath， 不然 CSS 里面的图片路径是以 CSS 目录为根目录的
+-   注意：抽离 css 需要配置一下 miniCssExtractPlugin 的 publicPath， 不然 CSS 里面的图片路径是以 CSS 目录为根目录的
 
 ```
 const miniCssExtractPlugin = require("mini-css-extract-plugin") // 抽离 css, 将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间
@@ -153,10 +153,10 @@ plugins: [
 
 #### 9、配置 css 浏览器兼容
 
-- 使用 postcss-loader autoprefixer
-- 在 postcss.config.js 中配置 autoprefixer (也可以使用 postcss-proset-env)
-- 在 package.json 中配置 browserslist
-- 在 webpack 中配置 postcss-loader
+-   使用 postcss-loader autoprefixer
+-   在 postcss.config.js 中配置 autoprefixer (也可以使用 postcss-proset-env)
+-   在 package.json 中配置 browserslist
+-   在 webpack 中配置 postcss-loader
 
 ```
 npm i postcss-loader autoprefixer -D
@@ -222,8 +222,8 @@ plugins: [
 
 #### 11、babel 做 js 兼容性处理
 
-- @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
-- 使用 core-js 对更高级语法的转换
+-   @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
+-   使用 core-js 对更高级语法的转换
 
 ```
 npm i babel-loader @babel/core @babel/preset-env core-js -D
@@ -262,11 +262,11 @@ npm i babel-loader @babel/core @babel/preset-env core-js -D
 
 #### 12、js 压缩
 
-- 在 webpack4, 只要将 mode 改为 production 将自动压缩 js 代码 或者在 package.json 中把 mode 配置
+-   在 webpack4, 只要将 mode 改为 production 将自动压缩 js 代码 或者在 package.json 中把 mode 配置
 
 #### 13、html 压缩
 
-- 使用 html-webpack-plugin
+-   使用 html-webpack-plugin
 
 ```
 plugins: [
@@ -314,7 +314,7 @@ devServer: {
 
 ### 2、优化代码调试 source-map: 源代码到构建代码的映射
 
-- 就是源代码有几十个模块，构建后可能只有一个模块，source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
+-   就是源代码有几十个模块，构建后可能只有一个模块，source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
 
 ```
 /**
@@ -345,7 +345,7 @@ devtool: MODE == "development" ? "cheap-module-eval-source-map" : "none",
 
 #### a、oneOf
 
-- 就是有很多 loader，每个文件都会被 所有的 loader 过一遍，其实这里面只有处理相关文件的 loader 会被命中(注意： 如果多个 loader 处理一个文件，需要把多出来的 loader 提到 oneOf 外面)
+-   就是有很多 loader，每个文件都会被 所有的 loader 过一遍，其实这里面只有处理相关文件的 loader 会被命中(注意： 如果多个 loader 处理一个文件，需要把多出来的 loader 提到 oneOf 外面)
 
 ```
 rules: [
@@ -359,7 +359,7 @@ rules: [
 
 #### b、缓存
 
-- babel 缓存 就是在生产环境中，当只改变一个 js，其他没变，那么打包时不可能又把所有的 js 编译一次，这时候应该使用 babel 缓存
+-   babel 缓存 就是在生产环境中，当只改变一个 js，其他没变，那么打包时不可能又把所有的 js 编译一次，这时候应该使用 babel 缓存
 
 ```
 // 使用 babel 缓存只需要在 babel 的 options 中加入 cacheDirectory: true
@@ -391,7 +391,7 @@ npm i thread-loader -D
 
 #### d、动态链接库 dll
 
-- 主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
+-   主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
 
 ```
 // 新建 webpack.dll.config.js, 并且在 package.json 配置 dll 启动命令   "dll": "webpack --config webpack.dll.config.js --mode production"
@@ -439,7 +439,7 @@ plugins: [
 
 #### e、配置文件别名
 
-- 优点：减少打包时的搜索文件时间
+-   优点：减少打包时的搜索文件时间
 
 ```
 resolve: {
@@ -455,7 +455,7 @@ resolve: {
 
 #### a、文件资源缓存
 
-- 主要就是借助浏览器缓存，服务端设置资源缓存，webpack 为 js 和 css 等文件添加文件 hash-->contenthash
+-   主要就是借助浏览器缓存，服务端设置资源缓存，webpack 为 js 和 css 等文件添加文件 hash-->contenthash
 
 ```
 output: {
@@ -471,13 +471,13 @@ plugins: [
 
 #### b、tree shaking 作用：去除无用代码，减少代码体积
 
-- js 使用条件 1、使用 es6 模块化 2、开启 production 环境
-- tree shaking 可能会把一些 css 干掉，所以需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"] 代表这些文件不会被 tree shaking
+-   js 使用条件 1、使用 es6 模块化 2、开启 production 环境
+-   tree shaking 可能会把一些 css 干掉，所以需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"] 代表这些文件不会被 tree shaking
 
 #### c、代码分割 code split
 
-- splitChunk 代码分割, 代码分割还会分析多入口是否有公用文件，有会单独打包成一个 chunk
-- 作用: 将一个很大的 js 文件拆分成多个 js 文件，利于并行加载，提高运行速度
+-   splitChunk 代码分割, 代码分割还会分析多入口是否有公用文件，有会单独打包成一个 chunk
+-   作用: 将一个很大的 js 文件拆分成多个 js 文件，利于并行加载，提高运行速度
 
 ```
 optimization: {
@@ -516,9 +516,9 @@ btn.addEventListener('click', (e) => {
 
 ####　ｅ、pwa 渐进式网络开发应用程序 离线可访问
 
-- 可靠 - 即使在网络不稳定甚至断网的环境下，也能瞬间加载并展现
-- 用户体验 - 快速响应，具有平滑的过渡动画及用户操作的反馈
-- 用户黏性 - 和 Native App 一样，可以被添加到桌面，能接受离线通知，具有沉浸式的用户体验
+-   可靠 - 即使在网络不稳定甚至断网的环境下，也能瞬间加载并展现
+-   用户体验 - 快速响应，具有平滑的过渡动画及用户操作的反馈
+-   用户黏性 - 和 Native App 一样，可以被添加到桌面，能接受离线通知，具有沉浸式的用户体验
 
 ```
 npm i workbox-webpack-plugin -D
@@ -577,4 +577,41 @@ plugins: [
 package.json 启动命令行加 --progress
 
 "build": "webpack --mode production --progress",
+```
+
+# webpack 拓展
+
+#### 写一个 loader
+
+```
+myLoader.js
+
+module.exports = function (source) {
+    // source 传进来的代码
+
+    /**
+     * this 有几个常用的
+     * this.query  通过 options 传过来的参数
+     * this.callback  可以代替 return 返回
+     * 
+     * this.callback(
+     *    err: Error | null,
+     *    content: string | Buffer,
+     *    sourceMap?: SourceMap,
+     *    meta?: any
+     * );
+     *   第一个参数必须是 Error 或者 null
+     *   第二个参数是一个 string 或者 Buffer。
+     *   可选的：第三个参数必须是一个可以被这个模块解析的 source map。
+     *   可选的：第四个选项，会被 webpack 忽略，可以是任何东西（例如一些元数据）。
+     * 
+     * 
+     */
+
+    const options = loaderUtils.getOptions(this)
+    const reset = source.replace("", options.xx)
+    this.callback(null, reset)
+}
+
+// 使用就像正常 loader 一样使用
 ```
