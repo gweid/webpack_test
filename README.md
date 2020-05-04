@@ -488,7 +488,7 @@ optimization: {
 }
 ```
 
-####　 d、懒加载和预加载
+#### d、懒加载和预加载
 
 ```
 index.js 中
@@ -514,7 +514,7 @@ btn.addEventListener('click', (e) => {
 })
 ```
 
-####　ｅ、pwa 渐进式网络开发应用程序 离线可访问
+#### ｅ、pwa 渐进式网络开发应用程序 离线可访问
 
 -   可靠 - 即使在网络不稳定甚至断网的环境下，也能瞬间加载并展现
 -   用户体验 - 快速响应，具有平滑的过渡动画及用户操作的反馈
@@ -614,4 +614,27 @@ module.exports = function (source) {
 }
 
 // 使用就像正常 loader 一样使用
+```
+
+#### 编写一个 plugin
+```
+class CoptyWebpackPlugin {
+  constructor() {}
+
+  apply(compiler) {
+    compiler.hooks.emit.tapAsync('CoptyWebpackPlugin', (compilation, cb) => {
+      compilation.assets['copty.js'] = {
+        source() {
+          return 'copty'
+        },
+        size() {
+          return 5
+        },
+      }
+      cb()
+    })
+  }
+}
+
+module.exports = CoptyWebpackPlugin
 ```
