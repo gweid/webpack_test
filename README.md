@@ -615,3 +615,5 @@ module.exports = function (source) {
 
 // 使用就像正常 loader 一样使用
 ```
+
+#### 写一个 plugin
