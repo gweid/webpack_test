@@ -1,4 +1,3 @@
-
 # webpack 定义
 
 本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle
@@ -643,4 +642,316 @@ class CoptyWebpackPlugin {
 }
 
 module.exports = CoptyWebpackPlugin
+```
+
+# webpack 打包原理
+
+### 流程
+
+-   首先，需要读到入口文件里的内容（也就是 index.js 的内容）
+-   其次，分析入口文件，递归的去读取模块所依赖的文件内容，生成依赖图
+-   最后，根据依赖图，生成浏览器能够运行的最终代码
+
+#### 读取入口文件里的内容
+
+使用 node.js 的 fs 模块读取内容
+
+```
+const fs = require('fs)
+
+const getModuleInfo = file => {
+    const body = fs(file, 'utf-8')
+
+    // body 就是 ./src/index.js 中的内容
+    console.log(body)
+}
+
+getModuleInfo('./src/index.js')
+```
+
+#### 分析模块内容
+
+借助 babel 的 parser 进行模块分析，即将入口文件生成 ast
+
+```
+const fs = require('fs')
+const parser = require('@babel/parser')
+
+const getModuleInfo = file => {
+    const body = fs(file, 'utf-8')
+
+    const ast = parser.parse(body, {
+        // 表示 es6 模块
+        sourceType: 'module'
+    })
+
+    // 文件内容在 ast.program.body 里面
+    console.log(ast.program.body)
+}
+
+getModuleInfo('./src/index.js')
+```
+
+#### 对得到的 ast 做处理，返回一份结构化的数据
+
+利用 @babel/traverse 对 ast.program.body 部分数据处理
+
+```
+const fs = require('fs')
+const path = require('path')
+const parser = require('@babel/parser')
+const traverse = require('@babel/traverse').default
+
+const getModuleInfo = file => {
+    const body = fs(file, 'utf-8')
+
+    const ast = parser.parse(body, {
+        // 表示 es6 模块
+        sourceType: 'module'
+    })
+
+    // 用来收集自身模块引入的依赖
+    const deps = {}
+
+    // 使用 traverse 遍历 ast，对 ImportDeclaration 的节点做处理（ImportDeclaration 代表自身模块引入的依赖），实际上就是把相对路径转化为绝对路径，并加到 deps
+    traverse(ast, {
+        ImportDeclaration({node}) {
+            const dirname = path.dirname(file)
+            const absPath = './' + path.join(dirname, node.source.value)
+            deps[node.source.value] = absPath
+        }
+    })
+}
+
+getModuleInfo('./src/index.js')
+```
+
+#### 对 ast 做语法转换，把 es6 的语法转化为 es5 的语法，使用 babel 核心模块@babel/core 以及@babel/preset-env 完成
+
+```
+const fs = require('fs')
+const path = require('path')
+const parser = require('@babel/parser')
+const traverse = require('@babel/traverse').default
+const babel = require('@babel/core')
+
+const getModuleInfo = file => {
+    const body = fs(file, 'utf-8')
+
+    const ast = parser.parse(body, {
+        // 表示 es6 模块
+        sourceType: 'module'
+    })
+
+    // 用来收集自身模块引入的依赖
+    const deps = {}
+
+    // 使用 traverse 遍历 ast，对 ImportDeclaration 的节点做处理（ImportDeclaration 代表自身模块引入的依赖），实际上就是把相对路径转化为绝对路径，并加到 deps
+    traverse(ast, {
+        ImportDeclaration({node}) {
+            const dirname = path.dirname(file)
+            const absPath = './' + path.join(dirname, node.source.value)
+            deps[node.source.value] = absPath
+        }
+    })
+
+    const { code } = babel.transformFromAst(ast, null, {
+        presets: ["@babel/preset-env"]
+    })
+
+    // 将代码信息转化为对象形式
+    // {
+    //     file: './src/index.js',
+    //     deps: ['./xx.js', './src/xxa.js'],
+    //     code: '...'
+    // }
+    const moduleInfo = { file, deps, code }
+
+    return moduleInfo
+}
+
+getModuleInfo('./src/index.js')
+```
+
+#### 递归的获取所有模块的信息
+
+这个过程，也就是获取依赖图(dependency graph)的过程，这个过程就是从入口模块开始，对每个模块以及模块的依赖模块都调用 getModuleInfo 方法就行分析，最终返回一个包含所有模块信息的对象
+
+```
+const parseModules = file => {
+    // 定义依赖图
+    const depsGraph = {}
+
+    // 获取入口的信息
+    const entry = getModuleInfo(file)
+
+    const temp = [entry]
+
+    for (let i = 0; i < temp.length; i++) {
+        const item = temp[i]
+        const deps = item.deps
+        if (deps) {
+            // 遍历模块的依赖，递归获取模块信息
+            for (const key in deps) {
+                if (deps.hasOwnProperty(key)) {
+                    temp.push(getModuleInfo(deps[key]))
+                }
+            }
+        }
+    }
+
+    temp.forEach(moduleInfo => {
+        depsGraph[moduleInfo.file] = {
+            deps: moduleInfo.deps,
+            code: moduleInfo.code
+        }
+    })
+
+    return depsGraph
+}
+parseModules('./src/index.js')
+```
+
+#### 生成浏览器可执行的代码，并写入 dist/bundle.js
+
+```
+// 生成浏览器可执行的代码
+const bundle = file => {
+    const depsGraph = JSON.stringify(parseModules(file))
+
+    return `(function(graph){
+        function require(file) {
+            var exports = {};
+            // 将相对路径转为绝对路径
+            function absRequire(relPath){
+                return require(graph[file].deps[relPath])
+            }
+            (function(require, exports, code){
+                // 通过 eval 去执行代码
+                eval(code)
+            })(absRequire, exports, graph[file].code)
+            return exports
+        }
+        require('${file}')
+    })(${depsGraph})`
+}
+
+
+const build = file => {
+    const content = bundle(file)
+
+    // 写入到 dist/bundle.js
+    fs.mkdirSync('./dist')
+    fs.writeFileSync('./dist/bundle.js', content)
+}
+
+build('./src/index.js')
+```
+
+#### 最终代码
+
+```
+const fs = require('fs')
+const path = require('path')
+const parser = require('@babel/parser')
+const traverse = require('@babel/traverse').default
+const babel = require('@babel/core')
+
+const getModuleInfo = file => {
+    const body = fs(file, 'utf-8')
+
+    const ast = parser.parse(body, {
+        // 表示 es6 模块
+        sourceType: 'module'
+    })
+
+    // 用来收集自身模块引入的依赖
+    const deps = {}
+
+    // 使用 traverse 遍历 ast，对 ImportDeclaration 的节点做处理（ImportDeclaration 代表自身模块引入的依赖），实际上就是把相对路径转化为绝对路径，并加到 deps
+    traverse(ast, {
+        ImportDeclaration({node}) {
+            const dirname = path.dirname(file)
+            const absPath = './' + path.join(dirname, node.source.value)
+            deps[node.source.value] = absPath
+        }
+    })
+
+    const { code } = babel.transformFromAst(ast, null, {
+        presets: ["@babel/preset-env"]
+    })
+
+    // 将代码信息转化为对象形式
+    // {
+    //     file: './src/index.js',
+    //     deps: ['./xx.js', './src/xxa.js'],
+    //     code: '...'
+    // }
+    const moduleInfo = { file, deps, code }
+
+    return moduleInfo
+}
+
+const parseModules = file => {
+    // 定义依赖图
+    const depsGraph = {}
+
+    // 获取入口的信息
+    const entry = getModuleInfo(file)
+
+    const temp = [entry]
+
+    for (let i = 0; i < temp.length; i++) {
+        const item = temp[i]
+        const deps = item.deps
+        if (deps) {
+            // 遍历模块的依赖，递归获取模块信息
+            for (const key in deps) {
+                if (deps.hasOwnProperty(key)) {
+                    temp.push(getModuleInfo(deps[key]))
+                }
+            }
+        }
+    }
+
+    temp.forEach(moduleInfo => {
+        depsGraph[moduleInfo.file] = {
+            deps: moduleInfo.deps,
+            code: moduleInfo.code
+        }
+    })
+
+    return depsGraph
+}
+
+const bundle = file => {
+    const depsGraph = JSON.stringify(parseModules(file))
+
+    return `(function(graph){
+        function require(file) {
+            var exports = {};
+            // 将相对路径转为绝对路径
+            function absRequire(relPath){
+                return require(graph[file].deps[relPath])
+            }
+            (function(require, exports, code){
+                // 通过 eval 去执行代码
+                eval(code)
+            })(absRequire, exports, graph[file].code)
+            return exports
+        }
+        require('${file}')
+    })(${depsGraph})`
+}
+
+
+const build = file => {
+    const content = bundle(file)
+
+    // 写入到 dist/bundle.js
+    fs.mkdirSync('./dist')
+    fs.writeFileSync('./dist/bundle.js', content)
+}
+
+build('./src/index.js')
 ```
