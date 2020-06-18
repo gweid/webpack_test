@@ -652,6 +652,8 @@ module.exports = CoptyWebpackPlugin
 -   其次，分析入口文件，递归的去读取模块所依赖的文件内容，生成依赖图
 -   最后，根据依赖图，生成浏览器能够运行的最终代码
 
+![webpack 流程图](/imgs/img1.png)
+
 #### 读取入口文件里的内容
 
 使用 node.js 的 fs 模块读取内容
