@@ -1,3 +1,8 @@
+
+# webpack 定义
+
+本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle
+
 # 基础功能
 
 #### 1、基础出入口
@@ -593,7 +598,7 @@ module.exports = function (source) {
      * this 有几个常用的
      * this.query  通过 options 传过来的参数
      * this.callback  可以代替 return 返回
-     * 
+     *
      * this.callback(
      *    err: Error | null,
      *    content: string | Buffer,
@@ -604,8 +609,8 @@ module.exports = function (source) {
      *   第二个参数是一个 string 或者 Buffer。
      *   可选的：第三个参数必须是一个可以被这个模块解析的 source map。
      *   可选的：第四个选项，会被 webpack 忽略，可以是任何东西（例如一些元数据）。
-     * 
-     * 
+     *
+     *
      */
 
     const options = loaderUtils.getOptions(this)
@@ -617,6 +622,7 @@ module.exports = function (source) {
 ```
 
 #### 编写一个 plugin
+
 ```
 class CoptyWebpackPlugin {
   constructor() {}
