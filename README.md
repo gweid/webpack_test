@@ -957,3 +957,11 @@ const build = file => {
 
 build('./src/index.js')
 ```
+
+
+
+附录完整 webpack 流程图
+
+![webpack 完整流程图](/imgs/img2.jpg)
+
+[webpack基本原理](https://blog.didiyun.com/index.php/2019/12/06/wepack-%e9%80%8f%e8%a7%86-%e6%8f%90%e9%ab%98%e5%b7%a5%e7%a8%8b%e5%8c%96%ef%bc%88%e5%ae%9e%e8%b7%b5%e7%af%87%ef%bc%89/)
