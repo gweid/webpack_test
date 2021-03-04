@@ -654,7 +654,7 @@ module.exports = CoptyWebpackPlugin
 
 ![webpack 流程图](/imgs/img1.png)
 
-#### 读取入口文件里的内容
+#### 1、读取入口文件里的内容
 
 使用 node.js 的 fs 模块读取内容
 
@@ -671,7 +671,7 @@ const getModuleInfo = file => {
 getModuleInfo('./src/index.js')
 ```
 
-#### 分析模块内容
+#### 2、分析模块内容
 
 借助 babel 的 parser 进行模块分析，即将入口文件生成 ast
 
@@ -694,7 +694,7 @@ const getModuleInfo = file => {
 getModuleInfo('./src/index.js')
 ```
 
-#### 对得到的 ast 做处理，返回一份结构化的数据
+#### 3、对得到的 ast 做处理，返回一份结构化的数据
 
 利用 @babel/traverse 对 ast.program.body 部分数据处理
 
@@ -728,7 +728,7 @@ const getModuleInfo = file => {
 getModuleInfo('./src/index.js')
 ```
 
-#### 对 ast 做语法转换，把 es6 的语法转化为 es5 的语法，使用 babel 核心模块@babel/core 以及@babel/preset-env 完成
+#### 4、对 ast 做语法转换，把 es6 的语法转化为 es5 的语法，使用 babel 核心模块@babel/core 以及@babel/preset-env 完成
 
 ```
 const fs = require('fs')
@@ -775,7 +775,7 @@ const getModuleInfo = file => {
 getModuleInfo('./src/index.js')
 ```
 
-#### 递归的获取所有模块的信息
+#### 5、递归的获取所有模块的信息
 
 这个过程，也就是获取依赖图(dependency graph)的过程，这个过程就是从入口模块开始，对每个模块以及模块的依赖模块都调用 getModuleInfo 方法就行分析，最终返回一个包含所有模块信息的对象
 
@@ -814,7 +814,7 @@ const parseModules = file => {
 parseModules('./src/index.js')
 ```
 
-#### 生成浏览器可执行的代码，并写入 dist/bundle.js
+#### 6、生成浏览器可执行的代码，并写入 dist/bundle.js
 
 ```
 // 生成浏览器可执行的代码
@@ -850,7 +850,7 @@ const build = file => {
 build('./src/index.js')
 ```
 
-#### 最终代码
+#### 7、最终代码
 
 ```
 const fs = require('fs')
@@ -960,8 +960,14 @@ build('./src/index.js')
 
 
 
-附录完整 webpack 流程图
+## 附录：
+
+1. webpack 流程图
 
 ![webpack 完整流程图](/imgs/img2.jpg)
 
-[webpack基本原理](https://blog.didiyun.com/index.php/2019/12/06/wepack-%e9%80%8f%e8%a7%86-%e6%8f%90%e9%ab%98%e5%b7%a5%e7%a8%8b%e5%8c%96%ef%bc%88%e5%ae%9e%e8%b7%b5%e7%af%87%ef%bc%89/)
+​       [webpack基本原理](https://blog.didiyun.com/index.php/2019/12/06/wepack-%e9%80%8f%e8%a7%86-%e6%8f%90%e9%ab%98%e5%b7%a5%e7%a8%8b%e5%8c%96%ef%bc%88%e5%ae%9e%e8%b7%b5%e7%af%87%ef%bc%89/)
+
+
+
+2. [简单实现一个 webpack](https://juejin.cn/post/6854818576470933512)
