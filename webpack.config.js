@@ -9,6 +9,10 @@ const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 // const AutodllWebpackPlugin = require('autodll-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
+// 对打包进行计时
+// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
+// const smp = new SpeedMeasurePlugin()
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin // 分析打包大小
 
 // css 公共配置
 function commentCss(mode) {
@@ -38,7 +42,15 @@ function commentCss(mode) {
   return option
 }
 
-module.exports = (env, options) => {
+function useAnalyz () {
+  if (process.env.NODE_ENV === 'analyzer') {
+    return [new BundleAnalyzerPlugin()]
+  }
+  return []
+}
+
+
+const webpackConfig = (env, options) => {
   const MODE = options.mode // 获取 webpack4 的 mode 值
 
   return {
@@ -205,6 +217,8 @@ module.exports = (env, options) => {
       // 打包构建前先清空 dist
       new CleanWebpackPlugin(),
 
+      ...useAnalyz(),
+
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: './src/index.html', // 以什么为模板
@@ -287,3 +301,6 @@ module.exports = (env, options) => {
     },
   }
 }
+
+// module.exports = smp.wrap(webpackConfig)
+module.exports = webpackConfig

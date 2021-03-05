@@ -2,6 +2,8 @@
 
 本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle
 
+
+
 # 基础功能
 
 #### 1、基础出入口
@@ -285,6 +287,8 @@ plugins: [
     })
 ]
 ```
+
+
 
 # webpack 性能优化
 
@@ -573,15 +577,84 @@ plugins: [
 ]
 ```
 
-# 优化体验
 
-#### 打包构建显示进度条
+
+# 优化体验和打包分析
+
+#### 1、打包构建显示进度条
 
 ```
 package.json 启动命令行加 --progress
 
 "build": "webpack --mode production --progress",
 ```
+
+#### 2、分析打包各个模块使用时间
+
+安装：
+
+```js
+npm install speed-measure-webpack-plugin -D
+```
+
+使用：
+
+```js
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
+const smp = new SpeedMeasurePlugin()
+
+const webpackConfig = (env, options) => {
+    return {
+        plugins: []
+    }
+}
+
+module.exports = smp.wrap(webpackConfig)
+```
+
+#### 3、配置不同环境
+
+在 webpack 中，可以使用 NODE_ENV=development 配置不同环境，但是直接使用 NODE_ENV 在不同平台（window、mac）有不同的使用方式，所以需要借助 cross-env 来抹平平台差异
+
+安装：
+
+```js
+npm install cross-env -D
+```
+
+使用：
+
+```js
+"scripts": {
+    "build": "cross-env NODE_ENV=production webpack"
+}
+```
+
+取值：
+
+```js
+process.env.NODE_ENV
+```
+
+#### 4、分析打包大小
+
+安装：
+
+```js
+npm install webpack-bundle-analyzer -D
+```
+
+使用：
+
+```js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
+plugins: [
+    new BundleAnalyzerPlugin()
+]
+```
+
+
 
 # webpack 拓展
 
@@ -643,6 +716,8 @@ class CoptyWebpackPlugin {
 
 module.exports = CoptyWebpackPlugin
 ```
+
+
 
 # webpack 打包原理
 
