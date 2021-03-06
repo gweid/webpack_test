@@ -206,7 +206,7 @@ plugins: [
     - defaults：Browserslist的默认浏览器（> 0.5%, last 2 versions, Firefox ESR, not dead）
     - \> 5%：浏览器市场占有份额大于 5%
     - dead：24个月内没有官方支持或更新的浏览器，一般配置 not dead
-    - last 2 versions：每个浏览器的最后2个版本
+    - last 2 versions：每个浏览器的最后2个版本，这个版本指的的大版本
   - Browserslist 怎么知道这些规则：
     - 在 node_modules/browserslist/index.js 下引入了 caniuse-lite 去判断
 
