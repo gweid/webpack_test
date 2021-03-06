@@ -62,7 +62,7 @@ const webpackConfig = (env, options) => {
         MODE === 'development'
           ? 'js/bundle.[hash:8].js'
           : 'js/bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
-      path: path.resolve(__dirname, 'dist'), // 全局路径
+      path: path.resolve(__dirname, 'dist'), // 全局路径，这个必须是绝对路径
       publicPath: MODE === 'development' ? '' : '', // 所有资源引入公共路径前缀
       chunkFilename: 'js/[name]_chunk.js', // 对非入口的 chunk 命名
       // library: '[name]', // 整个库向外暴露的名字

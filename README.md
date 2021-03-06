@@ -1,6 +1,38 @@
-# webpack 定义
+# webpack 认知
+
+#### 1、本质：
 
 本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle
+
+#### 2、安装：
+
+使用 webpack 目前需要安装 webpack、webpack-cli
+
+- 执行 webpack 命令会执行 node_modules 下的.bin目录下的webpack
+- webpack 的执行依赖于 webpack-cli，而webpack-cli中代码执行时，才是真正利用webpack进行编译和打包的过程
+
+#### 3、npx 命令：
+
+npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$PATH`里面，检查命令是否存在
+
+#### 4、webpack.config.js
+
+执行 webpack 命令，会先看看有没有 webpack.config.js 文件，如果有，会合并这里分配置
+
+可以通过命令改变，不使用 webpack.config.js
+
+```js
+"scripts": {
+    "build": "webpack --config wp.config.js"
+}
+// 这样就会默认去合并 wp.config.js 下的配置
+```
+
+#### 5、基本打包原则
+
+- 在 webpack 执行的时候，会根据命令或者配置文件找到入口文件
+- 从入口文件开始，查找出每一个依赖，生成一个依赖图
+- 然后遍历递归依赖图，根据文件不同，使用不同loader 处理文件，打包一个个模块
 
 
 
@@ -14,8 +46,8 @@ entry: "./src/js/index.js", // 入口名
 // 出口
 output: {
     filename: "js/bundle.js", // 出口文件名
-    path: path.resolve(__dirname, "dist") // 全局路径
-},
+    path: path.resolve(__dirname, "dist") // 全局路径，这个必须是绝对路径
+}
 ```
 
 #### 2、css/scss/less 这些 loader
@@ -159,10 +191,28 @@ plugins: [
 
 #### 9、配置 css 浏览器兼容
 
--   使用 postcss-loader autoprefixer
--   在 postcss.config.js 中配置 autoprefixer (也可以使用 postcss-proset-env)
--   在 package.json 中配置 browserslist
--   在 webpack 中配置 postcss-loader
+- 使用 postcss-loader autoprefixer
+
+- 在 postcss.config.js 中配置 autoprefixer (也可以使用 postcss-proset-env)
+
+- 在 package.json 中配置 browserslist，或者使用 .browserslistrc
+
+  - Browserslist：是一个在不同的前端工具之间，共享目标浏览器和 Node.js 版本的配置
+    - autoprefixer
+    - babel
+    - postcss-preset-env
+    - ......
+  - Browserslist 常用规则：
+    - defaults：Browserslist的默认浏览器（> 0.5%, last 2 versions, Firefox ESR, not dead）
+    - \> 5%：浏览器市场占有份额大于 5%
+    - dead：24个月内没有官方支持或更新的浏览器，一般配置 not dead
+    - last 2 versions：每个浏览器的最后2个版本
+  - Browserslist 怎么知道这些规则：
+    - 在 node_modules/browserslist/index.js 下引入了 caniuse-lite 去判断
+
+  - 查看浏览器市场占有率：https://www.caniuse.com/usage-table
+
+- 在 webpack 中配置 postcss-loader
 
 ```
 npm i postcss-loader autoprefixer -D
