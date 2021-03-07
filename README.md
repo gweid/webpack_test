@@ -191,13 +191,20 @@ plugins: [
 
 #### 9、配置 css 浏览器兼容
 
-- 使用 postcss-loader autoprefixer
+使用 postcss-loader + autoprefixer
 
-- 在 postcss.config.js 中配置 autoprefixer (也可以使用 postcss-proset-env)
+**认识 postcss：**
 
+首先，postcss 本身是独立的，它可以在很多地方使用，并不局限于 webpack 中；但是它本身提供很少的功能，更多的功能依赖于插件，比如加浏览器前缀就是需要 autoprefixer 这个插件
+
+而在 webpack 中使用 postcss，那么需要的就是 postcss-loader
+
+
+
+- 在 postcss.config.js 中配置 autoprefixer；**但更多的是使用 postcss-preset-env**，因为 postcss-preset-env 除了本身内置了 autoprefixer 的功能，还可以帮助我们将一些现代的 css 特性，转成大多数浏览器认识的 css，并且会根据目标浏览器或者运行时环境添加所需的 polyfill； 很多框架的 cli 也是使用的 postcss-preset-env
 - 在 package.json 中配置 browserslist，或者使用 .browserslistrc
 
-  - Browserslist：是一个在不同的前端工具之间，共享目标浏览器和 Node.js 版本的配置
+  - Browserslist：是一个在不同的前端工具之间，共享目标浏览器和 Node.js 版本的配置，比如下面的都会依赖于 Browserslist
     - autoprefixer
     - babel
     - postcss-preset-env
@@ -211,7 +218,6 @@ plugins: [
     - 在 node_modules/browserslist/index.js 下引入了 caniuse-lite 去判断
 
   - 查看浏览器市场占有率：https://www.caniuse.com/usage-table
-
 - 在 webpack 中配置 postcss-loader
 
 ```
@@ -264,6 +270,93 @@ webpack.config.js
     ]
 }
 ```
+
+或者不单独使用 postcss.config.js 文件，直接在 webpack.config.js 中配置：
+
+```js
+{
+    test: /\.css$/,
+    use: [
+        "style-loader", // 将 css 插入 head 标签
+        "css-loader", // 将 css 以模块引入
+        {
+            loader: "postcss-loader",
+            options: {
+                postcssOptions: {
+                    plugins: [
+                        require('autoprefixer')
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
+
+**postcss-preset-env：**
+安装：
+
+```js
+npm i postcss-preset-env -D
+```
+
+使用：
+
+```js
+{
+    test: /\.css$/,
+    use: [
+        "style-loader", // 将 css 插入 head 标签
+        "css-loader", // 将 css 以模块引入
+        {
+            loader: "postcss-loader",
+            options: {
+                postcssOptions: {
+                    plugins: [
+                        require('postcss-preset-env')
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
+
+**使用 @import "./test.css" 问题：**
+
+当在 index.css 中通过 @import "./test.css" 引入 css，那么这个引入的 css 是不会被 postcss-loader 去处理的，因为 @import "./test.css" 属于 css 语法，不属于 js，直接被 css-loader 处理，那么需要配置一下 css-loader
+
+- importLoaders 的值取决于 css-loader 之前还有几个 loader，如这里，之前只有一个 postcss-loader，那么值为 1
+
+```js
+{
+    test: /\.css$/,
+    use: [
+        "style-loader", // 将 css 插入 head 标签
+        {
+            loader: "css-loader",
+            options: {
+                importLoaders: 1
+            }
+        }, // 将 css 以模块引入
+        {
+            loader: "postcss-loader",
+            option,
+            options: {
+                importLoaders: 1
+}s: {
+                postcssOptions: {
+                    plugins: [
+                        require('postcss-preset-env')
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
+
+
 
 #### 10、压缩 css 使用 optimize-css-assets-webpack-plugin
 

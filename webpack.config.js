@@ -15,7 +15,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先�
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin // 分析打包大小
 
 // css 公共配置
-function commentCss(mode) {
+function commentCss(mode, importLoaders = 1) {
   let option = []
 
   // 只在生产环境进行 css 抽离，便于在开发环境中使用 HMR
@@ -37,7 +37,13 @@ function commentCss(mode) {
   }
 
   // 配合 autoprefixer 做自动添加前缀
-  option.push(...['css-loader', 'postcss-loader'])
+  option.push(...[
+    {
+      loader: 'css-loader',
+      options: { importLoaders }
+    },
+    'postcss-loader'
+  ])
 
   return option
 }
@@ -149,7 +155,7 @@ const webpackConfig = (env, options) => {
             },
             {
               test: /\.scss$/,
-              use: [...commentCss(MODE), 'sass-loader'],
+              use: [...commentCss(MODE, 2), 'sass-loader'],
             },
             {
               test: /\.(jpg|png|gif)$/,

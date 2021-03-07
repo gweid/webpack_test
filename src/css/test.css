@@ -1,0 +1,8 @@
+.import-css {
+    margin-left: 50px;
+    margin-top: 80px;
+    width: 200px;
+    height: 200px;
+    background-color: pink;
+    transform: rotate(45deg);
+}
