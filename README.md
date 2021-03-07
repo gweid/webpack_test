@@ -75,11 +75,35 @@ npm i style-loader css-loader sass-loader node-sass -D
 
 #### 3、图片 loader
 
--   依赖 file-loader url-loader
+使用 file-loader 或者 url-loader
+
+
+
+一般在项目中是使用 url-loader，因为 url-loader 可以将图片文件，转成 base64 的 URI，直接打包到 bundle.js 中
+
+- 小的图片转换base64之后可以和页面一起被请求，减少不必要的请求过程
+- 如果大的图片也进行转换，那么会导致 bundle.js 过大，反而会影响页面的请求速度
+
+所以，对于是否转换需要一个阈值，一般只会将一些 icon 小图标转换为 base64
+
+
+
+url-loader 使用的一些 placeholder（空间占位符）：
+
+- [ext]： 原文件扩展名
+- [name]：原文件名
+- [hash]：文件的内容，使用MD4的散列函数处理，生成的一个128位的hash值（32个十六进制）
+- [hash:<length>]：截图hash的长度，默认32个字符太长了
+
+安装：
+
+```js
+npm i url-loader -D
+```
+
+使用：
 
 ```
-npm i file-loader url-loader -D
-
 {
     test: /\.(jpg|png|gif)$/,
     use: [{
