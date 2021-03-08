@@ -142,8 +142,8 @@ const webpackConfig = (env, options) => {
 
     module: {
       rules: [
-        {
-          oneOf: [
+        // {
+        //   oneOf: [
             {
               // 使用这个要将 url-loader 的引入规范改为 CommonJS
               test: /\.(html|htm)$/,
@@ -214,8 +214,8 @@ const webpackConfig = (env, options) => {
                 },
               ],
             },
-          ],
-        },
+        //   ],
+        // },
       ],
     },
 

@@ -131,6 +131,16 @@ npm i html-withimg-loader -D
 
 #### 5、 编译 html 使用 html-webpack-pligin
 
+在 webpack 中，是不会对 html 文件进行编译的，所以需要利用 html-webpack-pligin 将 index.html 编译到 dist 下。而且，html-webpack-pligin 打包后的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等
+
+安装：
+
+```js
+npm i html-webpack-plugin -D
+```
+
+使用：
+
 ```
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
@@ -825,7 +835,46 @@ plugins: [
 
 # webpack 拓展
 
-#### 写一个 loader
+### 1、一些实用的 plugins
+
+#### a、copy-webpack-plugin
+
+将一个目录复制到另外一个目录下
+
+安装：
+
+```js
+npm i copy-webpack-plugin -D
+```
+
+使用：
+
+在 patterns 中设置复制规则
+
+-  **from：**设置从哪一个源中开始复制
+- **to：**复制到的位置，可以省略，会默认复制到打包的目录下
+- **globOptions：**设置一些额外的选项，比如可以编写需要忽略的文件：
+
+```js
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+new CopyWebpackPlugin({
+    patterns: {
+        from: 'public',
+        globOptions: {
+            ignore: [
+                '**/index.html'
+            ]
+        }
+    }
+})
+```
+
+
+
+### 2、自定义 loader 和 plugins
+
+#### a、写一个 loader
 
 ```
 myLoader.js
@@ -860,7 +909,7 @@ module.exports = function (source) {
 // 使用就像正常 loader 一样使用
 ```
 
-#### 编写一个 plugin
+#### b、编写一个 plugin
 
 ```
 class CoptyWebpackPlugin {
