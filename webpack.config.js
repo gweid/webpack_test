@@ -1,4 +1,5 @@
 const path = require('path')
+const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 抽离 css, 将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin') // 压缩 css
@@ -13,6 +14,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先�
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 // const smp = new SpeedMeasurePlugin()
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin // 分析打包大小
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 // css 公共配置
 function commentCss(mode, importLoaders = 1) {
@@ -60,7 +62,8 @@ const webpackConfig = (env, options) => {
   const MODE = options.mode // 获取 webpack4 的 mode 值
 
   return {
-    entry: ['./src/js/index.js', './src/index.html'], // 加 index.html 主要是 html 修改不会热替换
+    // entry: ['./src/js/index.js', './public/index.html'], // 加 index.html 主要是 html 修改不会热替换
+    entry: ['./src/js/index.js'],
 
     output: {
       // filename: 'js/bundle.[contenthash:8].js', // 出口文件名 使用 hash 值
@@ -144,11 +147,11 @@ const webpackConfig = (env, options) => {
       rules: [
         // {
         //   oneOf: [
-            {
-              // 使用这个要将 url-loader 的引入规范改为 CommonJS
-              test: /\.(html|htm)$/,
-              loader: 'html-withimg-loader', // 主要将 html 中使用 img 标签引入的图片使用动态路径 <img src="./aa.jpg">
-            },
+            // {
+            //   // 使用这个要将 url-loader 的引入规范改为 CommonJS
+            //   test: /\.(html|htm)$/,
+            //   loader: 'html-withimg-loader', // 主要将 html 中使用 img 标签引入的图片使用动态路径 <img src="./aa.jpg">
+            // },
             {
               test: /\.css$/,
               use: [...commentCss(MODE)],
@@ -226,13 +229,34 @@ const webpackConfig = (env, options) => {
       ...useAnalyz(),
 
       new HtmlWebpackPlugin({
+        title: 'gweid webpack',
         filename: 'index.html',
-        template: './src/index.html', // 以什么为模板
+        template: './public/index.html', // 以什么为模板
         // 压缩 HTML 的配置
         minify: {
           removeComments: true, // 是否去掉注释
           collapseWhitespace: true, // 折叠成一行
         },
+      }),
+
+      // 设置全局常量
+      new DefinePlugin({
+        BASE_URL: '"./"'
+      }),
+
+      // 复制目录
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'public',
+            globOptions: {
+              ignore: [
+                '**/index.html',
+                '**/.DS_Store' // mac 系统忽略这个
+              ]
+            }
+          }
+        ]
       }),
 
       // 抽离 css  将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间

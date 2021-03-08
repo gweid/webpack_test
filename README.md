@@ -33,6 +33,13 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 - 在 webpack 执行的时候，会根据命令或者配置文件找到入口文件
 - 从入口文件开始，查找出每一个依赖，生成一个依赖图
 - 然后遍历递归依赖图，根据文件不同，使用不同loader 处理文件，打包一个个模块
+- 最后将结果输出（当然，中间打包的过程可以通过 plugin 控制整个生命周期）
+
+#### 6、loader 和 plugin 差别
+
+**loader：** loader 是在对模块进行转换的时候起作用
+
+**plugin：** plugin 可以贯穿整个 webpack 的生命周期，执行更加广泛的任务，比如打包优化、资源管理等
 
 
 
@@ -131,7 +138,11 @@ npm i html-withimg-loader -D
 
 #### 5、 编译 html 使用 html-webpack-pligin
 
-在 webpack 中，是不会对 html 文件进行编译的，所以需要利用 html-webpack-pligin 将 index.html 编译到 dist 下。而且，html-webpack-pligin 打包后的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等
+在 webpack 中，是需要一个 html 模板的，这个 html 模板可以通过 html-webpack-pligin 自动生成，当然，也可以新建一个 index.html 模板，一般都这样做，因为可以通过 ejs 语法动态插值。而且，html-webpack-pligin 生成的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等
+
+html-webpack-pligin 是根据 .ejs 文件去生成的 html 模板
+
+![](/imgs/img3.png)
 
 安装：
 
@@ -149,6 +160,87 @@ plugins: [
         template: "./src/index.html", // 以什么为模板
     }),
 ]
+```
+
+
+
+除了这样，还可以通过一些参数去动态插值到 html 模板
+
+> 注意，使用了 html-withimg-loader 后 <%= %> 这些语句不生效；注释掉 html-withimg-loader  后在入口 entry: ['./src/js/index.js', './src/index.html'], // 加 index.html 主要是 html 修改不会热替换  要删除 './src/index.html'
+
+index.html
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+
+<body>
+    <div id="app"></div>
+</body>
+
+</html>
+```
+
+webpack.config.js
+
+```js
+new HtmlWebpackPlugin({
+    title: 'gweid webpack',
+    filename: 'index.html',
+    template: './src/index.html', // 以什么为模板
+}),
+new DefinePlugin({
+    BASE_URL: './'
+})
+```
+
+- <%= htmlWebpackPlugin.options.title %> 这个由 HtmlWebpackPlugin 中的 title 获得
+- <%= BASE_URL %> 这个由 DefinePlugin 定义的全局常量获得
+
+
+
+如果使用了 `<link rel="icon" href="<%= BASE_URL %>favicon.ico">`，需要将 ico 复制到 dist
+
+安装：
+
+```js
+npm i copy-webpack-plugin@6.3.2 -D
+```
+
+> 注意，可能新版本 copy-webpack-plugin 有问题，所以安装 6.3.2 版本
+
+使用：
+
+在 patterns 中设置复制规则
+
+- **from：**设置从哪一个源中开始复制
+- **to：**复制到的位置，可以省略，会默认复制到打包的目录下
+- **globOptions：**设置一些额外的选项，比如可以编写需要忽略的文件：
+
+```js
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+new CopyWebpackPlugin({
+    patterns: [
+        {
+            from: 'public',
+            globOptions: {
+                ignore: [
+                    '**/index.html',
+                    '**/.DS_Store' // mac 系统忽略这个
+                ]
+            }
+        }
+    ]
+}),
 ```
 
 #### 6、devServer 开发环境自动化
@@ -836,39 +928,6 @@ plugins: [
 # webpack 拓展
 
 ### 1、一些实用的 plugins
-
-#### a、copy-webpack-plugin
-
-将一个目录复制到另外一个目录下
-
-安装：
-
-```js
-npm i copy-webpack-plugin -D
-```
-
-使用：
-
-在 patterns 中设置复制规则
-
--  **from：**设置从哪一个源中开始复制
-- **to：**复制到的位置，可以省略，会默认复制到打包的目录下
-- **globOptions：**设置一些额外的选项，比如可以编写需要忽略的文件：
-
-```js
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-
-new CopyWebpackPlugin({
-    patterns: {
-        from: 'public',
-        globOptions: {
-            ignore: [
-                '**/index.html'
-            ]
-        }
-    }
-})
-```
 
 
 

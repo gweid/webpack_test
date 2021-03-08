@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 
 <body>
     <!-- 测试测试 -->
-    <div>
+    <div id="app">
         <h1>标题</h1>
         <p>测试</p>
 
@@ -21,7 +22,7 @@
         </div>
 
         <div class="set-image">
-            <img src="./images/vue.jpg" alt="" style="width: 200px;height:200px;">
+            <img src="../images/vue.jpg" alt="" style="width: 200px;height:200px;">
         </div>
 
         <div class="liner-box"></div>
