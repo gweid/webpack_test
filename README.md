@@ -198,7 +198,7 @@ new HtmlWebpackPlugin({
     template: './src/index.html', // 以什么为模板
 }),
 new DefinePlugin({
-    BASE_URL: './'
+    BASE_URL: '"./"'
 })
 ```
 

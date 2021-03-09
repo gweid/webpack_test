@@ -1,5 +1,5 @@
 const path = require('path')
-const { DefinePlugin } = require('webpack')
+const { DefinePlugin } = require('webpack') // 设置全局变量
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 抽离 css, 将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin') // 压缩 css
@@ -14,7 +14,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先�
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 // const smp = new SpeedMeasurePlugin()
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin // 分析打包大小
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin') // 复制目录
 
 // css 公共配置
 function commentCss(mode, importLoaders = 1) {
