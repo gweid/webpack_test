@@ -41,7 +41,101 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 
 **plugin：** plugin 可以贯穿整个 webpack 的生命周期，执行更加广泛的任务，比如打包优化、资源管理等
 
+#### 7、webpack 的模块化
 
+在 webpack 中，可以使用各种各样的模块化，包括 CommonJS、ES Module 等
+
+- CommonJS 模块化
+
+  首先是 format.js 中
+
+  ```js
+  const dateFormat = (date) => {
+    return "2020-12-12";
+  }
+  
+  const priceFormat = (price) => {
+    return "100.00";
+  }
+  
+  module.exports = {
+    dateFormat,
+    priceFormat
+  }
+  
+  ```
+
+  然后 common.js 
+
+  ```js
+  const { dateFormat, priceFormat } = require('./js/format');
+  
+  console.log(dateFormat("abc"));
+  console.log(priceFormat("abc"));
+  ```
+
+  打包后产物：
+
+  ```js
+  // 最外层就是一个自制行函数
+  (function () {
+    // 定义了一个对象去存储模块
+    // 模块的路径是对象的 key，模块的代码封装在一个函数里作为是对象的 value
+    var __webpack_modules__ = {
+      './src/js/format.js': function (module) {
+        const dateFormat = (date) => {
+          return '2020-12-12';
+        };
+  
+        const priceFormat = (price) => {
+          return '100.00';
+        };
+  
+        module.exports = {
+          dateFormat,
+          priceFormat,
+        };
+      },
+    };
+  
+    // 这个对象, 作为加载模块的缓存
+    var __webpack_module_cache__ = {};
+  
+    // 当加载一个模块时，都会通过这个函数来加载
+    function __webpack_require__(moduleId) {
+      // 1、判断缓存是否加载过
+      if (__webpack_module_cache__[moduleId]) {
+        return __webpack_module_cache__[moduleId].exports;
+      }
+  
+      // 2、给 module 变量和 __webpack_module_cache__[moduleId] 赋值了同一个对象
+      // 这样做的好处：两者同时指向同一个对象，那么，当这个被指向的对象改变，那么这两者的也会同时改变
+      var module = __webpack_module_cache__[moduleId] = { exports: {} };
+  
+      // 3、加载模块
+      // 将 module={ exports: {} } 这个对象传给 __webpack_modules__[moduleId] 这个函数，让这个函数往 module 添加东西
+      __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+  
+      // 4、到处 module.export { dateFormat: function, priceForamt: function }
+      return module.exports;
+    }
+  
+    // 通过自执行函数实现代码逻辑
+    !(function () {
+      // 将 require 加载转换为实现的 __webpack_require__ 加载，通过 __webpack_require__ 去加载模块
+      const { dateFormat, priceFormat } = __webpack_require__('./src/js/format.js');
+  
+      console.log(dateFormat('abc'));
+      console.log(priceFormat('abc'));
+    })();
+  })();
+  ```
+
+- ES Module 模块化
+
+- CommonJS 加载 ES Module
+
+- ES Module 加载 CommonJS 
 
 # 基础功能
 
@@ -57,7 +151,42 @@ output: {
 }
 ```
 
-#### 2、css/scss/less 这些 loader
+#### 2、mode
+
+在 webpack 中，有三种模式 mode，是 webpack 为了简化配置
+
+三种模式分别是：
+
+**mode=development： 相当于做了以下的配置**
+
+![](/imgs/img4.png)
+
+**mode=production： 相当于做了以下的配置**
+
+![](/imgs/img5.png)
+
+**mode=none： 相当于做了以下的配置**
+
+![](/imgs/img6.png)
+
+设置： 
+
+```js
+"scripts": {
+    "dev": "webpack-dev-server --mode development --progress",
+    "build": "webpack --mode production --progress",
+}
+```
+
+或者在 webpack.config.js 中：
+
+```js
+module.exports = {
+    mode: 'development'
+}
+```
+
+#### 3、css/scss/less 这些 loader
 
 ```
 npm i style-loader css-loader sass-loader node-sass -D
@@ -80,7 +209,7 @@ npm i style-loader css-loader sass-loader node-sass -D
 }
 ```
 
-#### 3、图片 loader
+#### 4、图片 loader
 
 使用 file-loader 或者 url-loader
 
@@ -124,7 +253,7 @@ npm i url-loader -D
 }
 ```
 
-#### 4、当图片是直接通过 img 便签引入，需要使用 html-withimg-loader
+#### 5、当图片是直接通过 img 便签引入，需要使用 html-withimg-loader
 
 ```
 npm i html-withimg-loader -D
@@ -136,7 +265,7 @@ npm i html-withimg-loader -D
 }
 ```
 
-#### 5、 编译 html 使用 html-webpack-pligin
+#### 6、 编译 html 使用 html-webpack-pligin
 
 在 webpack 中，是需要一个 html 模板的，这个 html 模板可以通过 html-webpack-pligin 自动生成，当然，也可以新建一个 index.html 模板，一般都这样做，因为可以通过 ejs 语法动态插值。而且，html-webpack-pligin 生成的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等
 
@@ -243,7 +372,7 @@ new CopyWebpackPlugin({
 }),
 ```
 
-#### 6、devServer 开发环境自动化
+#### 7、devServer 开发环境自动化
 
 ```
 npm i webpack-dev-server -D
@@ -258,7 +387,7 @@ devServer: {
 },
 ```
 
-#### 7、每次打包前先清空出口目录 clean-webpack-plugin
+#### 8、每次打包前先清空出口目录 clean-webpack-plugin
 
 ```
 const {
@@ -271,7 +400,7 @@ plugins: [
 ]
 ```
 
-#### 8、抽离 css
+#### 9、抽离 css
 
 -   注意：抽离 css 需要配置一下 miniCssExtractPlugin 的 publicPath， 不然 CSS 里面的图片路径是以 CSS 目录为根目录的
 
@@ -315,7 +444,7 @@ plugins: [
 ]
 ```
 
-#### 9、配置 css 浏览器兼容
+#### 10、配置 css 浏览器兼容
 
 使用 postcss-loader + autoprefixer
 
@@ -484,7 +613,7 @@ npm i postcss-preset-env -D
 
 
 
-#### 10、压缩 css 使用 optimize-css-assets-webpack-plugin
+#### 11、压缩 css 使用 optimize-css-assets-webpack-plugin
 
 ```
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin') // 压缩 css
@@ -495,7 +624,7 @@ plugins: [
 ]
 ```
 
-#### 11、babel 做 js 兼容性处理
+#### 12、babel 做 js 兼容性处理
 
 -   @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
 -   使用 core-js 对更高级语法的转换
@@ -535,11 +664,11 @@ npm i babel-loader @babel/core @babel/preset-env core-js -D
 }
 ```
 
-#### 12、js 压缩
+#### 13、js 压缩
 
 -   在 webpack4, 只要将 mode 改为 production 将自动压缩 js 代码 或者在 package.json 中把 mode 配置
 
-#### 13、html 压缩
+#### 14、html 压缩
 
 -   使用 html-webpack-plugin
 

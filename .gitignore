@@ -2,6 +2,8 @@
 node_modules
 /dist
 dll
+test/module/node_modules
+test/module/dist
 
 # Log files
 npm-debug.log*

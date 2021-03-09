@@ -4,7 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "webpack-dev-server --mode development --progress",
+        "dev": "webpack --mode development --progress",
+        "serve": "webpack-dev-server --mode development --progress",
         "build": "webpack --mode production --progress",
         "dll": "webpack --config webpack.dll.config.js --mode production --progress",
         "analyz": "cross-env NODE_ENV=analyzer webpack"

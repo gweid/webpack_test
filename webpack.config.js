@@ -126,6 +126,7 @@ const webpackConfig = (env, options) => {
      *
      * 脚手架工具 Vue Cli 在开发环境用的是 eval-source-map; 在生产环境用的是 source-map
      */
+    // devtool: 'source-map', // 没有 eval 后，构建的产物不是 eval('') 的形式
     devtool: MODE === 'development' ? 'cheap-module-eval-source-map' : 'none',
 
     // 主要用于 cdn 引入的包, 忽略打包
