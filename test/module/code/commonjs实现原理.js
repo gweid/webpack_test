@@ -23,6 +23,7 @@
   var __webpack_module_cache__ = {};
 
   // 当加载一个模块时，都会通过这个函数来加载
+  // moduleId 就是需要加载的模块路径
   function __webpack_require__(moduleId) {
     // 1、判断缓存是否加载过
     if (__webpack_module_cache__[moduleId]) {
@@ -37,7 +38,7 @@
     // 将 module={ exports: {} } 这个对象传给 __webpack_modules__[moduleId] 这个函数，让这个函数往 module 添加东西
     __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 
-    // 4、到处 module.export { dateFormat: function, priceForamt: function }
+    // 4、导出 module.export { dateFormat: function, priceForamt: function }
     return module.exports;
   }
 
