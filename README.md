@@ -168,7 +168,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
         // 调用 __webpack_require__.r，记录 __esModule 为 true
         __webpack_require__.r(__webpack_exports__)
   
-        // 调用 __webpack_require__.d，将 __webpack_exports__ 没有的代理到 { sum: Function, mul: Function }
+        // 调用 __webpack_require__.d，将 exports 没有的代理到 { sum: Function, mul: Function }
         __webpack_require__.d(__webpack_exports__, {
           sum: function () {
             return sum
@@ -218,6 +218,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
           // 如果一个 key 在 definition 中，而不在 exports 中
           if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
             // 为 module 的 exports 代理到 definition，访问 module.exports 的 key 会被代理到 definition，访问
+            // 也就是说 exports 本身并没有 { sum: Function, mul: Function }，访问 sum 的时候实际上读取的是 definition 的
             Object.defineProperty(exports, key, { enumerable: true, get: definition[key] })
           }
         }
@@ -239,6 +240,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
           Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' })
         }
         // 为 module 的 exports 对象设置一个 __esModule，值为 true
+        // 目的就是标记当前这个模块是不是 es module，以便后面如果需要，能够用到这个信息
         Object.defineProperty(exports, '__esModule', { value: true })
       }
     })()
