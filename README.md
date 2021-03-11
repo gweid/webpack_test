@@ -981,7 +981,28 @@ devServer: {
 
 ### 2、优化代码调试 source-map: 源代码到构建代码的映射
 
--   就是源代码有几十个模块，构建后可能只有一个模块，source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
+经过 webpack 编译后：
+
+- 真实跑在浏览器上的代码，和我们编写的代码其实是有差异的；
+
+- 比如ES6的代码可能被转换成ES5；
+
+- 比如对应的代码行号、列号在经过编译后肯定会不一致；
+
+- 比如代码进行丑化压缩时，会将编码名称等修改；
+
+- 比如我们使用了TypeScript等方式编写的代码，最终转换成JavaScript
+
+而 source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
+
+**使用 source-map：**
+
+1. 在 webpack 打包的时候，根据 devtool 生成 source-map
+
+2. 在 打包后的产物 bundle.js 最后添加一行注释 `//# sourceMappingURL=bundle.js.map`
+3. 浏览器会这行注释，查找响应的 source-map
+
+**webpack 中 devtool 配置：**
 
 ```
 /**
