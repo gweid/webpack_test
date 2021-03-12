@@ -44,7 +44,7 @@ function commentCss(mode, importLoaders = 1) {
       loader: 'css-loader',
       options: { importLoaders }
     },
-    'postcss-loader'
+    'postcss-loader' // postcss 的配置在 postcss.config.js 文件
   ])
 
   return option
@@ -190,7 +190,7 @@ const webpackConfig = (env, options) => {
                   loader: 'babel-loader',
                   options: {
                     // 预设：指示 babel 做怎么样的兼容性处理
-                    // 这只能做一些基本的，类似 promise es7 之类的语法还需要额外处理
+                    // 这只能做一些基本的，类似 promise es7 之类的语法还需要额外处理（使用 core-js 对更高级语法的转换）
                     presets: [
                       [
                         '@babel/preset-env',
@@ -201,14 +201,17 @@ const webpackConfig = (env, options) => {
                           corejs: {
                             version: 3,
                           },
-                          // targets    具体兼容到哪个浏览器
-                          targets: {
-                            chrome: '58',
-                            firefox: '40',
-                            ie: '9',
-                            edge: '17',
-                            safari: '10',
-                          },
+                          // targets 具体兼容到哪个浏览器
+                          // 或者可以通过 browserslist 来配置浏览器兼容
+                          // 如果 targets 和 browserslist 都配置了，targets 会覆盖 browserslist
+                          // 实际使用更推荐通过 browserslist 来配置，因为 browserslist 不仅仅是可以 babel 可以使用，postcss 也可以使用
+                          // targets: {
+                          //   chrome: '58',
+                          //   firefox: '40',
+                          //   ie: '9',
+                          //   edge: '17',
+                          //   safari: '10',
+                          // },
                         },
                       ],
                     ],

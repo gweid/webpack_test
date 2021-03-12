@@ -910,7 +910,10 @@ npm i babel-loader @babel/core @babel/preset-env core-js -D
                 corejs: {
                   version: 3,
                 },
-                // targets    具体兼容到哪个浏览器
+                // targets 具体兼容到哪个浏览器
+                // 或者可以通过 browserslist 来配置浏览器兼容
+                // 如果 targets 和 browserslist 都配置了，targets 会覆盖 browserslist
+                // 实际使用更推荐通过 browserslist 来配置，因为 browserslist 不仅仅是可以 babel 可以使用，postcss 也可以使用
                 targets: {
                   chrome: '58',
                   firefox: '40',
@@ -995,6 +998,16 @@ devServer: {
 
 而 source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
 
+**source-map 组成：**
+
+- version：版本，当前版本为3；最开始的 source-map （版本1）的体积是源代码的 10 倍，版本 2 减少了 50%，版本 3 又减少 50%，所以当前版本 3 的体积相当于源代码的 2.5 倍
+- sources：没经过转换的文件（没转换之前是各个模块，转换之后可能就一个 bundle.js 文件，所以需要标记源文件）
+- name：没经过转换之前的变量和属性名（转换后的变量名可能是之前的缩写）
+- mappings：用来和源文件映射的信息（比如位置信息等），一串base64 VLQ（veriable length quantity可变长度值）编码
+- file：打包后的文件
+- sourcesContent：转换前的源代码
+- psourceRoot：所有的sources相对的根目录
+
 **使用 source-map：**
 
 1. 在 webpack 打包的时候，根据 devtool 生成 source-map
@@ -1003,6 +1016,8 @@ devServer: {
 3. 浏览器会这行注释，查找响应的 source-map
 
 **webpack 中 devtool 配置：**
+
+不同的配置生成的 source-map 也会有差异，而且会影响打包性能
 
 ```
 /**
