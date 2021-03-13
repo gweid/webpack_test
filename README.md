@@ -1017,30 +1017,81 @@ devServer: {
 
 **webpack 中 devtool 配置：**
 
-不同的配置生成的 source-map 也会有差异，而且会影响打包性能
+不同的配置生成的 source-map 也会有差异，而且会影响打包性能。而 devtool 的值有多达 26 个
 
-```
-/**
- * [inline | hidden | eval-][nosource-][cheap-[module-]]source-map
- * inline-source-map 内联在bundle.js   速度快
- * hidden-source-map 外部 .map 只有错误代码原因，不能映射到源码的错误位置
- * eval-source-map   内联
- * cheap-source-map  错误代码信息和源代码位置，精确到行，更快
- */
-/**
- * 开发环境  考虑：速度快，调试友好
- *    速度快（eval>inline>cheap>...） cheap-eval-source-map
- *    调试友好 module 这个会将 loader 的source map 加入
- *    所以综合 开发环境使用  cheap-module-eval-source-map / eval-source-map 这个调试更加友好，速度回慢一点(有很多脚手架使用这个)
- *
- * 生产环境  考虑：source-map 体积小,而且是外部  源代码需不需要隐藏？是否需要调试友好？
- *    综合： cheap-module-source-map / source-map 这个调试更加友好 / 或者不需要 source-map 用 none
- *
- * 脚手架工具 Vue Cli 在开发环境用的是 eval-source-map; 在生产环境用的是 source-map
- */
+1. 不会生成 source-map 的情况：
 
-devtool: MODE == "development" ? "cheap-module-eval-source-map" : "none",
-```
+   - false：不使用 source-map，也就是没有任何和 source-map 相关的内容
+
+   - none：production 模式下的默认值，不生成 source-map
+
+   - eval：development 模式下的默认值，不生成 source-map；但是它会在 eval 执行的代码中，添加 `//# sourceURL=`，它会被浏览器在执行时解析，并且在调试面板中生成对应的一些文件目录，方便调试代码（webpack 使用 eval 函数是因为 eval 函数可以添加  `//# sourceURL=` 这个注释，帮助找到错误位置）
+
+     ![](/imgs/img7.png)
+
+     eval 错误警告：
+
+     ![](/imgs/img8.png)
+
+2. source-map：生成一份完整的 source-map 文件
+
+   ![](/imgs/img9.png)
+
+   错误也会准确被定位：
+
+   ![](/imgs/img10.png)
+
+3. eval-source-map：会生成 sourcemap，但是source-map 是以 DataUrl 形式添加到 **eval 函数**的后面
+
+   ![](/imgs/img11.png)
+
+   > 只要有 eval 这个关键字，并且带 source-map，而没有 nosources，那么 source-map 都是以 DataUrl 形式添加到 eval 函数的后面
+
+   有 source-map 生成都是可以准确定位错误的
+
+4. inline-source-map：会生成 sourcemap，但是source-map 是以 DataUrl 添加到 **bundle 文件**的末尾（与 eval 的区别： eval 是添加到 eval 函数后面，inline 是添加到 bundle 文件末尾）
+
+   ![](/imgs/img12.png)
+
+5. cheap-source-map：会生成 sourcemap，而且是外部 source-map文件，但 cheap 会更加高效一些（cheap低开销），因为它没有生成列映射（即报错信息是整个一行都标红），在开发中，通常只需要行信息通常就可以定位到错误了
+
+   ![](/imgs/img13.png)
+
+   可以看到，错误定位到了某一行，而没有定位到 abc 上
+
+   > 注意： 直接 cheap-source-map 会有缺点，当使用了 loader 对代码进行了转换，那么报错代码的行数这些信息会不准确
+
+6. cheap-module-source-map：如果使用了 loader 对代码转换，那么使用这个错误信息会更准确
+
+7. hidden-source-map：会生成 sourcemap，**但是不会对 source-map 文件进行引用，如果需要使用，可以手动引入**
+
+8. nosources-source-map：会生成 sourcemap，但是生成的 sourcemap 只有错误信息的提示，不会生成源代码文件
+
+   ![](/imgs/img14.png)
+
+综合上面：
+
+webpack 对于 source-map 提供了 26 个值，是可以进行多组合的
+
+组合规则：
+
+- inline-|hidden-|eval：三个值时三选一
+
+- nosources：可选值
+
+- cheap可选值，并且可以跟随module的值
+
+  ```js
+  [inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map
+  ```
+
+最佳实践：
+
+- 开发阶段：推荐使用 source-map 或者 cheap-module-source-map（最好是 cheap-module-source-map，效率更高），这分别是 vue 和 react 使用的值，可以获取调试信息，方便快速开发
+- 测试阶段：推荐使用 source-map 或者 cheap-module-source-map（最好是 cheap-module-source-map，效率更高）；测试阶段希望在浏览器下看到正确的错误提示
+- 发布阶段：false、缺省值（不写）；发布阶段不需要，因为毕竟 source-map 有体积大小问题，对请求响应有影响。而且，如果生产环境有 source-map，那么就意味着可以通过错误还原源代码，导致代码不安全。
+
+
 
 ## 二、生产环境性能优化
 
