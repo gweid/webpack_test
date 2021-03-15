@@ -43,6 +43,8 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 
 #### 7、webpack 的模块化
 
+> 备注：代码在 test/module/code 中
+
 在 webpack 中，可以使用各种各样的模块化，包括 CommonJS、ES Module 等
 
 - CommonJS 模块化
@@ -887,6 +889,14 @@ plugins: [
 
 #### 12、babel 做 js 兼容性处理
 
+**什么是babel：**
+
+babel 是一个工具链，用于将 ES6+ 的代码转换为向下兼容的 JS 代码，包括：语法转换（jsx、ts 等）、源代码转换、Polyfill 等。
+
+并且 babel 和 postcss 一样，是一个独立的工具，并不是说必须依赖于 webpack 才能使用，只是 babel 在 webpack 中使用提供了 babel-loader
+
+**babel-loder 的使用：**
+
 -   @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
 -   使用 core-js 对更高级语法的转换
 
@@ -927,6 +937,55 @@ npm i babel-loader @babel/core @babel/preset-env core-js -D
   },
 }
 ```
+
+**babel 基本原理：**
+
+> 备注：代码在 test/babel 中
+
+babel 其实就是一个编译器，将我们的源代码转换为另外一种源代码（目标代码）
+
+其基本编译流程
+
+- 解析阶段（parse）
+- 转换阶段（transformation）
+- 生成阶段（code generation）
+
+![](/imgs/img15.jpg)
+
+- 源代码经过词法分析，转换为 tokens 数组
+
+  - 词法分析就是对代码逐个单词进行分析，例如 `const name = 'jack'`，那么会分析 `const`、`name`、`=`、`\'jack\'`
+
+  - 生成的 token 数组就是分析的每一个词的组合
+
+    ```js
+    // tokens 数组
+    [
+      {
+          "type": "Keyword",
+          "value": "const"
+      },
+      {
+          "type": "Identifier",
+          "value": "name"
+      },
+      {
+          "type": "Punctuator",
+          "value": "="
+      },
+      {
+          "type": "String",
+          "value": "\'jack\'"
+      },
+    ]
+    ```
+
+- 将 tokens 进行语法分析（也叫 parse），转换成 ast 树
+
+- 对 ast 语法树进行遍历（traversal）、访问（visitor），当遇到某一个节点符合需要使用某个 plugin 进行转换的条件，那么使用这个 plugin 转换节点；最后生成一个新的 ast
+
+- 根据新的 ast 生成转换后的代码
+
 
 #### 13、js 压缩
 
