@@ -895,49 +895,6 @@ babel 是一个工具链，用于将 ES6+ 的代码转换为向下兼容的 JS �
 
 并且 babel 和 postcss 一样，是一个独立的工具，并不是说必须依赖于 webpack 才能使用，只是 babel 在 webpack 中使用提供了 babel-loader
 
-**babel-loder 的使用：**
-
--   @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
--   使用 core-js 对更高级语法的转换
-
-```
-npm i babel-loader @babel/core @babel/preset-env core-js -D
-
-{
-    test: /\.js/,
-    exclude: /node_modules/, // 排除 node_modules
-    loader: 'babel-loader',
-    options: {
-        // 预设：指示 babel 做怎么样的兼容性处理
-        // 这只能做一些基本的，类似 promise es7 之类的语法还需要额外处理
-        presets: [
-            [
-              '@babel/preset-env',
-              {
-                // useBuiltIns: 'usage'   按需加载
-                useBuiltIns: 'usage',
-                // corejs: 3   指定 corejs 版本
-                corejs: {
-                  version: 3,
-                },
-                // targets 具体兼容到哪个浏览器
-                // 或者可以通过 browserslist 来配置浏览器兼容
-                // 如果 targets 和 browserslist 都配置了，targets 会覆盖 browserslist
-                // 实际使用更推荐通过 browserslist 来配置，因为 browserslist 不仅仅是可以 babel 可以使用，postcss 也可以使用
-                targets: {
-                  chrome: '58',
-                  firefox: '40',
-                  ie: '9',
-                  edge: '17',
-                  safari: '10',
-                },
-            },
-        ],
-    ],
-  },
-}
-```
-
 **babel 基本原理：**
 
 > 备注：代码在 test/babel 中
@@ -985,6 +942,49 @@ babel 其实就是一个编译器，将我们的源代码转换为另外一种�
 - 对 ast 语法树进行遍历（traversal）、访问（visitor），当遇到某一个节点符合需要使用某个 plugin 进行转换的条件，那么使用这个 plugin 转换节点；最后生成一个新的 ast
 
 - 根据新的 ast 生成转换后的代码
+
+**babel-loder 的使用：**
+
+-   @babel/preset-env 只能转换一些基本语法，类似 promise 之类不转换
+-   使用 core-js 对更高级语法的转换
+
+```
+npm i babel-loader @babel/core @babel/preset-env core-js -D
+
+{
+    test: /\.js/,
+    exclude: /node_modules/, // 排除 node_modules
+    loader: 'babel-loader',
+    options: {
+        // 预设：指示 babel 做怎么样的兼容性处理
+        // 这只能做一些基本的，类似 promise es7 之类的语法还需要额外处理
+        presets: [
+            [
+              '@babel/preset-env',
+              {
+                // useBuiltIns: 'usage'   按需加载
+                useBuiltIns: 'usage',
+                // corejs: 3   指定 corejs 版本
+                corejs: {
+                  version: 3,
+                },
+                // targets 具体兼容到哪个浏览器
+                // 或者可以通过 browserslist 来配置浏览器兼容
+                // 如果 targets 和 browserslist 都配置了，targets 会覆盖 browserslist
+                // 实际使用更推荐通过 browserslist 来配置，因为 browserslist 不仅仅是可以 babel 可以使用，postcss 也可以使用
+                targets: {
+                  chrome: '58',
+                  firefox: '40',
+                  ie: '9',
+                  edge: '17',
+                  safari: '10',
+                },
+            },
+        ],
+    ],
+  },
+}
+```
 
 
 #### 13、js 压缩
