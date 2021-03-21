@@ -1039,6 +1039,43 @@ module.exports = {
 },
 ```
 
+**认识 polyfill**
+
+主要的意思就是垫片、补丁
+
+当使用了一些语法特性（例如：Promise, Generator, Symbol、Array.prototype.includes等），浏览器并不会识别，这个时候就需要 polyfill 来进行打补丁
+
+使用：
+
+- 在 babel 7.40 之前，通常使用 @babel/polyfill的包
+- babel7.4.0之后，已经不推荐使用 @babel/polyfill；而是单独引入core-js 和 regenerator-runtime 来完成 polyfill 的使用
+
+在 babel.config.js 中配置 polyfill：
+
+- ：设置以什么样的方式来使用 polyfill 
+  - false：打包后的文件不使用polyfill来进行适配
+  - usage：会根据源代码中出现的语言特性，按需加载所需要的 polyfill，这样可以确保最终包里的 polyfill 数量的最小化；可以配合 corejs 版本使用。直接使用 usage 可能会有问题，比如一些第三方库本身有自己的 polyfill ，那么就可能就有冲突，**所以需要配置 babel-loader 忽略 node_modules; `exclude: /node_modules/,`**
+  - entry：如果我们依赖的某一个库本身使用了某些 polyfill 的特性，但是因为我们使用的是usage，所以之后用户浏览器可能会报错。如果担心出现这种情况，可以使用 entry。此时就需要在**入口文件手动**添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime'。但是这样做会根据 browserslist 目标导入所有的polyfill，对应的包也会变大
+- corejs：设置corejs 的版本，目前使用比较多的是 3.x 版本；也可以设置是否对提议阶段的特性进行支持，将 proposals 属性设为 true 即可
+
+```js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'usage',
+        corejs: {
+          version: 3,
+        }
+      }
+    ]
+  ]
+};
+```
+
+
+
 **了解 babel 的 Stage-X**
 
 主要就是分阶段加入不同的语言特性

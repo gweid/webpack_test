@@ -3,11 +3,12 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        // useBuiltIns: 'usage'   按需加载
+        // useBuiltIns: 'usage'   按需加载所需要的 polyfill
         useBuiltIns: 'usage',
         // corejs: 3   指定 corejs 版本
         corejs: {
           version: 3,
+          // proposals: true // 是否对提议阶段的特性进行支持
         },
         // targets 具体兼容到哪个浏览器
         // 或者可以通过 browserslist 来配置浏览器兼容
