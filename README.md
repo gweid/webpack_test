@@ -1052,7 +1052,7 @@ module.exports = {
 
 在 babel.config.js 中配置 polyfill：
 
-- ：设置以什么样的方式来使用 polyfill 
+- useBuiltIns：设置以什么样的方式来使用 polyfill 
   - false：打包后的文件不使用polyfill来进行适配
   - usage：会根据源代码中出现的语言特性，按需加载所需要的 polyfill，这样可以确保最终包里的 polyfill 数量的最小化；可以配合 corejs 版本使用。直接使用 usage 可能会有问题，比如一些第三方库本身有自己的 polyfill ，那么就可能就有冲突，**所以需要配置 babel-loader 忽略 node_modules; `exclude: /node_modules/,`**
   - entry：如果我们依赖的某一个库本身使用了某些 polyfill 的特性，但是因为我们使用的是usage，所以之后用户浏览器可能会报错。如果担心出现这种情况，可以使用 entry。此时就需要在**入口文件手动**添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime'。但是这样做会根据 browserslist 目标导入所有的polyfill，对应的包也会变大
@@ -1074,9 +1074,45 @@ module.exports = {
 };
 ```
 
+**了解 Plugin-transform-runtime**
 
+在使用 useBuiltIns + corejs 配置 polyfill 的时候，默认情况是添加的所有特性都是全局的；如果我们正在编写一个工具库，这个工具库需要使用 polyfill； 别人在使用我们工具时，工具库通过polyfill添加的特性，可能会污染它们的代码；所以，当编写工具时，babel 更推荐使用一个插件： @babel/plugin-transform-runtime 来完成polyfill 的功能
 
-**了解 babel 的 Stage-X**
+安装：
+
+```js
+npm install @babel/plugin-transform-runtime -D
+```
+
+还有就是对应安装对应版本的 corejs3
+
+| false    | npm i @babel/runtime -S         |
+| -------- | ------------------------------- |
+| corejs 2 | npm i @babel/runtime-corejs2 -S |
+| corejs 3 | npm i @babel/runtime-corejs3 -S |
+
+使用：
+
+```js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env'
+    ],
+  ],
+    plugins: [
+        [
+            '@babel/plugin-transform-runtime', {
+                'corejs': 3
+            }
+        ]
+    ]
+};
+```
+
+> 这个只是开发第三方库的时候需要注意的，平常使用 useBuiltIns + corejs 即可
+
+**了解 babel 的 Stage-X **
 
 主要就是分阶段加入不同的语言特性
 
