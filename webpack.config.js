@@ -176,7 +176,7 @@ const webpackConfig = (env, options) => {
               ],
             },
             {
-              test: /\.js/,
+              test: /\.jsx?/,
               exclude: /node_modules/, // 排除 node_modules
               // include: path.resolve(__dirname, 'src'), // 只检查 src 下的
               // enforce: 'pre',  // pre: 优先执行 | post: 延后执行   多用于一个 js 需要多个 loader 编译
