@@ -2,7 +2,9 @@ import '@css/index.css'
 import '@css/index.scss'
 
 import hello from './hello'
-// import './jsx_index'
+import './jsx_index'
+import './ts_index.ts'
+
 import $ from "jquery"
 import zepto from "zepto-webpack"
 

@@ -1132,6 +1132,66 @@ module.exports = {
 };
 ```
 
+**12-9、babel 对 ts 的准换**
+
+在 webpack 中使用 ts，可以：
+
+- 使用 ts-loader
+
+  安装：
+
+  ```js
+  npm i typescript ts-loader -D
+  ```
+
+  使用：
+
+  1. tsc --init：初始化一份 tsconfig.json 配置（如果命令失败，全局安装一下 typescript `npm i typescript -g`）
+
+  2. ```js
+     {
+       test: /\.tsx?/,
+       exclude: /node_modules/,
+       use: ['babel-loader', 'ts-loader']
+     }
+     ```
+
+     使用 babel-loader 是为了将 Promise 之类的语法转换为 es5 的语法
+
+     使用了 babel-loader 之后可以看到 Promise 语法在 bundle.js 中被定义：
+
+     `modules/es.promise */ "./node_modules/core-js/modules/es.promise.js");`
+
+- 使用 @babel/preset-typescript
+
+  安装：
+
+  ```js
+  npm install @babel/preset-typescript -D
+  ```
+
+  使用：
+
+  1. 在 babel.config.js 中：
+
+     ```js
+     module.exports = {
+       presets: [
+         ['@babel/preset-typescript']
+       ]
+     }
+     ```
+
+  2. 在 webpack.congih.js 中
+
+     ```js
+     {
+       test: /\.tsx?/,
+       exclude: /node_modules/,
+       use: 'babel-loader'
+     }
+     ```
+
 **12-、了解 babel 的 Stage-X **
 
 主要就是分阶段加入不同的语言特性
