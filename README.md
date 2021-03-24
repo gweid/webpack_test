@@ -1192,7 +1192,32 @@ module.exports = {
      }
      ```
 
-**12-、了解 babel 的 Stage-X **
+两种编译 ts 的方法对比：
+
+- ts-loader + babel-loader：编译时间稍微多点，编译有错误提示
+
+- @babel/preset-typescript：编译时间快，但是编译没有错误提示。例如 ts 文件
+
+  ```js
+  const fun = (str: string) => {
+      console.log(str)
+  }
+  
+  fun(123)
+  ```
+
+   函数 fun 的参数要求是 string 类型，此时编译器已经报错，但是执行 `npm run build` 依然能够正常编译成功
+
+  解决： 通过 npm 的 tsc 脚本进行监控错误
+
+  ```js
+  "scripts": {
+     // 再开一个 npm 脚本自动检查类型
+    "type-check": "tsc --watch",
+  },
+  ```
+
+12-、了解 babel 的 Stage-X **
 
 主要就是分阶段加入不同的语言特性
 
