@@ -115,17 +115,6 @@ const webpackConfig = (env, options) => {
      * eval-source-map   内联
      * cheap-source-map  错误代码信息和源代码位置，精确到行，更快
      */
-    /**
-     * 开发环境  考虑：速度快，调试友好
-     *    速度快（eval>inline>cheap>...） cheap-eval-source-map
-     *    调试友好 module 这个会将 loader 的source map 加入
-     *    所以综合 开发环境使用  cheap-module-eval-source-map / eval-source-map 这个调试更加友好，速度回慢一点(有很多脚手架使用这个)
-     *
-     * 生产环境  考虑：source-map 体积小,而且是外部  源代码需不需要隐藏？是否需要调试友好？
-     *    综合： cheap-module-source-map / source-map 这个调试更加友好 / 或者不需要 source-map 用 none
-     *
-     * 脚手架工具 Vue Cli 在开发环境用的是 eval-source-map; 在生产环境用的是 source-map
-     */
     // devtool: 'source-map', // 没有 eval 后，构建的产物不是 eval('') 的形式
     // devtool: MODE === 'development' ? 'cheap-module-eval-source-map' : 'none',
     devtool: MODE === 'development' ? 'source-map' : 'none',
