@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 
 export class App extends Component {
     constructor(props) {
         super(props)
 
         this.state = {
-            message: 'hello, jsx'
+            message: 'hello, jsx',
         }
     }
 

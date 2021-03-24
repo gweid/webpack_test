@@ -1266,6 +1266,70 @@ plugins: [
 ]
 ```
 
+#### 15、ESLint
+
+ESLink：是一个静态代码分析工具，可以帮助我们在项目中建立统一的团队代码规范，保持正确、统一的代码风格，提高代码的可读性、可维护性
+
+
+
+安装：
+
+```js
+npm i eslint -D
+```
+
+初始化一份配置：
+
+```js
+npx eslint --init
+```
+
+
+
+编译代码时，对代码进行 eslint 检测
+
+安装：
+
+```js
+npm i eslint-loader -D
+```
+
+使用：
+
+```js
+use: ['babel-loader', 'eslint-loader']
+```
+
+> 要在 babel-loader 转译代码之前使用
+
+配合 webpack-dev-serve 进行浏览器实时提示
+
+```js
+devServer: {
+  overlay: true, // 配合 eslint 实时在浏览器弹出语法错误
+}
+```
+
+
+
+通过 vscode 插件辅助 eslint
+
+- 安装 ESLint 插件
+
+  ![](/imgs/img15.png)
+
+  那么就可以在写代码期间编译器就会有代码风格错误提示
+
+- 安装 Prettier 插件
+
+  ![](/imgs/img16.png)
+
+  并且配置
+
+  ![](/imgs/img17.png)
+
+  再在项目 .eslintrc.js 同级目录 下新建 .prettierrc 里面配置需要使用的 prettier 规则，就可以在保存的时候自动修正代码规范
+
 
 
 # webpack 性能优化

@@ -79,6 +79,7 @@ const webpackConfig = (env, options) => {
     },
 
     devServer: {
+      overlay: true, // 配合 eslint 实时在浏览器弹出语法错误
       publicPath: '', // 所有资源引入公共路径前缀
       // 要运行的目录 只是在内存中编译打包，不指向真正的目录
       contentBase: path.resolve(__dirname, 'dist'),
@@ -182,13 +183,14 @@ const webpackConfig = (env, options) => {
                     // 开启 babel 缓存，第二次打包时，会读取之前的缓存，优化打包速度
                     cacheDirectory: true,
                   }
-                }
+                },
+                'eslint-loader'
               ],
             },
             {
               test: /\.tsx?/,
               exclude: /node_modules/, // 排除 node_modules
-              use: ['babel-loader', 'ts-loader']
+              use: ['babel-loader', 'ts-loader', 'eslint-loader']
             }
         //   ],
         // },

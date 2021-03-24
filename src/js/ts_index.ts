@@ -1,9 +1,17 @@
-const message: string = 'jack'
+const message: string = 'jack';
 
 const printFun = (str: string) => {
-    console.log(str)
-}
+  console.log(str);
+};
 
-const resPromise = new Promise((resolve, reject) => {})
+const resPromise = new Promise((resolve, reject) => {
+  if (message === 'jack') {
+    resolve('ok');
+  } else {
+    reject();
+  }
+});
 
-printFun(message)
+resPromise.then();
+
+printFun(message);

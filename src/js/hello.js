@@ -1,10 +1,7 @@
-console.log("hello.js 执行了11111");
-
+console.log('hello.js 执行了11111');
 
 function hello() {
-    console.log("helle 哈哈哈哈哈哈");
+  console.log('helle 哈哈哈哈哈哈');
 }
 
-
-export default hello
-
+export default hello;

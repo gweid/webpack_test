@@ -1,47 +1,49 @@
-import '@css/index.css'
-import '@css/index.scss'
+import '../css/index.css';
+import '../css/index.scss';
 
-import hello from './hello'
-import './jsx_index'
-import './ts_index.ts'
+// import './jsx_index';
+import './ts_index.ts';
 
-import $ from "jquery"
-import zepto from "zepto-webpack"
+import $ from 'jquery';
+import zepto from 'zepto-webpack';
 
-console.log('index.js加载')
+import hello from './hello';
 
-console.log($)
+console.log('index.js加载');
+
+console.log($);
 console.log(zepto);
 
-
-hello()
+hello();
 
 function test() {
-  return 'test huancun'
+  return 'test huancun';
 }
-console.log(console.log(test()))
+console.log(console.log(test()));
 
-const add = (x, y) => {
-  return x + y
-}
-console.log(add(1, 51))
+const add = (x, y) => x + y;
 
-const arr = [1, 2, 3]
-console.log(arr.includes(1))
+console.log(add(1, 51));
+
+const arr = [1, 2, 3];
+console.log(arr.includes(1));
 
 class Person {
   constructor(name) {
-    this.name = name
+    this.name = name;
   }
+
   getName() {
-    console.log(this.name)
+    console.log(this.name);
   }
 }
-const person = new Person('jacklusy')
-person.getName()
 
-const btn = document.querySelector('#btn')
-btn.addEventListener('click', (e) => {
+const person = new Person('jacklusy');
+person.getName();
+
+const btn = document.querySelector('#btn');
+
+btn.addEventListener('click', () => {
   // 懒加载
   // import('./sub').then(({ addSub }) => {
   //   console.log(addSub(1, 7))
@@ -53,14 +55,14 @@ btn.addEventListener('click', (e) => {
   // })
 
   // 预加载  webpackPrefetch: true
-  import( /* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(
+  import(/* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(
     ({
-      addSub
+      addSub,
     }) => {
-      console.log(addSub(1, 9))
-    }
-  )
-})
+      console.log(addSub(1, 9));
+    },
+  );
+});
 
 // 注册 serviceworker 并且处理兼容问题
 if ('serviceWorker' in navigator) {
@@ -68,10 +70,10 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker
       .register('/service-worker.js')
       .then(() => {
-        console.log('serviceWorker 注册成功')
+        console.log('serviceWorker 注册成功');
       })
       .catch((err) => {
-        console.log('serviceWorker 注册失败')
-      })
-  })
+        console.log(`serviceWorker 注册失败 ${err}`);
+      });
+  });
 }
