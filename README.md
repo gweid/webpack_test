@@ -1330,6 +1330,28 @@ devServer: {
 
   再在项目 .eslintrc.js 同级目录 下新建 .prettierrc 里面配置需要使用的 prettier 规则，就可以在保存的时候自动修正代码规范
 
+#### 16、编译 Vue 文件
+
+需要安装两个模块：
+
+- `npm i vue-template-compiler -D `
+- `npm i vue-loader -D`
+
+在 webpack.config.js 中配置：
+
+```js
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
+{
+    test: /\.vue$/,
+    use: ['vue-loader']
+}
+
+plugins: [
+    new VueLoaderPlugin()
+]
+```
+
 
 
 # webpack 性能优化
