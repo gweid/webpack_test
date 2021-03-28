@@ -635,11 +635,47 @@ new CopyWebpackPlugin({
 }),
 ```
 
-#### 7、devServer 开发环境自动化
+#### 7、开发环境自动编译
+
+常见的在开发环境进行自动编译方式：
+
+- 使用 webpack 的 watch 模式
+- 使用 webpack-dev-server
+
+**使用 webpack 的 watch 模式**
+
+1. 在 webpack.config.js 中添加 `watch: true`
+
+   ```js
+   module.exports = {
+       watch: true
+   }
+   ```
+
+2. 在 package.json 中添加 --watch
+
+   ```js
+   "scripts": {
+       "watch": "webpack --watch"
+   }
+   ```
+
+特点：
+
+- 只有有一个依赖文件发生变化，那么就会重新编译
+- 不会刷新浏览器
+
+**使用 webpack-dev-server**
+
+安装：
+
+```js
+npm i webpack-dev-server -D
+```
+
+使用：
 
 ```
-npm i webpack-dev-server -D
-
 devServer: {
   // 要运行的目录 只是在内存中编译打包，不指向真正的目录
   contentBase: path.resolve(__dirname, 'dist'),
