@@ -404,13 +404,45 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 
 #### 1、基础出入口
 
-```
-entry: "./src/js/index.js", // 入口名
+**入口：**
 
-// 出口
-output: {
-    filename: "js/bundle.js", // 出口文件名
-    path: path.resolve(__dirname, "dist") // 全局路径，这个必须是绝对路径
+```js
+module.exports = {
+    entry: "./src/js/index.js", // 入口名
+}
+```
+
+**出口：**
+
+- filename：出口文件名
+
+- path：出口文件全局路径，这个必须是绝对路径
+
+- publicPath：指定 index.html 文件打包引用的一个基本路径
+
+  - 的默认值是一个空字符串，所以打包后引入 js 文件时，路径是 bundle.js
+
+    ![](/imgs/img20.png)
+
+  - 在开发中，我们也将其设置为 / ，路径是 /bundle.js，那么浏览器会根据所在的域名+路径去请求对应的资源
+
+    ![](/imgs/img21.png)
+
+  - 如果希望在本地直接打开 html 文件来运行，会将其设置为 ./，路径是 ./bundle.js，可以根据相对路径去查找资源
+
+    ![](/imgs/img22.png)
+
+  > 思考：类似 vue 的脚手架，默认就是 `publicPath: '/'`，那么直打开 index.html，是没有类似 `http://localhost:3000/` 这样的一个服务，而是协议头类似 `file://` 这样的，那么按照 域名+路径 的方式就加载不到。所以可以改为 ./ 的形式
+
+- 
+
+```js
+moodule.exports: {
+    // 出口
+    output: {
+        filename: "js/bundle.js", // 出口文件名
+        path: path.resolve(__dirname, "dist") // 全局路径，这个必须是绝对路径
+    }
 }
 ```
 
