@@ -1,13 +1,18 @@
 import '../css/index.css';
 import '../css/index.scss';
 
-// import './jsx_index';
+import './jsx_index.jsx';
 import './ts_index.ts';
+import './hmr_test';
 
 import $ from 'jquery';
 import zepto from 'zepto-webpack';
 
 import hello from './hello';
+
+if (module.hot) {
+  module.hot.accept('./hmr_test.js', () => {});
+}
 
 console.log('index.js加载');
 

@@ -660,12 +660,17 @@ new CopyWebpackPlugin({
    }
    ```
 
-特点：
+缺点：
 
-- 只有有一个依赖文件发生变化，那么就会重新编译
-- 不会刷新浏览器
+- 只要有一个依赖文件发生变化，那么就会重新编译所有源代码
+- 编译成功后，都需要生成新的 bundle.js 文件，那么就需要进行频繁的文件写入操作
+- 不会自动刷新浏览器
 
 **使用 webpack-dev-server**
+
+webpack-dev-server 在编译之后不会写入到任何输出文件。而是将 bundle 文件保留在内存中。实现这一点主要是使用了一个库 [memory-fs](https://github.com/webpack/memory-fs) 这个库是由webpack 本身维护的，后来不再使用，改为使用 [memfs](https://github.com/streamich/memfs) 
+
+![](/imgs/img18.png)
 
 安装：
 
@@ -675,15 +680,83 @@ npm i webpack-dev-server -D
 
 使用：
 
+在 package.json 中：
+
+```js
+"scripts": {
+    "serve": "webpack-dev-server"
+}
 ```
-devServer: {
-  // 要运行的目录 只是在内存中编译打包，不指向真正的目录
-  contentBase: path.resolve(__dirname, 'dist'),
-  compress: true, // 启动 gzip 压缩
-  progress: true, // 显示进度条
-  port: 3000, // 端口
-  open: true, // 自动打开浏览器
-},
+
+> 这样已经可以直接开启一个本地服务。
+
+
+
+**模块热替换HMR**
+
+模块热替换是指在应用程序运行过程中，替换、添加、删除模块，而**无需重新刷新整个页面**
+
+- 不重新加载整个页面，这样可以保留某些应用程序的状态不丢失
+- 修改了css、js源代码，会立即在浏览器更新
+
+使用 HMR： webpack-dev-server 已经支持 HMR，需要配置开启一下即可
+
+> 在不开启 HMR 的情况下，当我们修改了源代码之后，整个页面会自动刷新，使用的是 live reloading
+
+在 webpack.config.js 中：
+
+```js
+module.exports: {
+    devServer: {
+      hot: true // 打开 HMR 模块热替换
+    }
+}
+```
+
+然后需要指定哪些模块发生变化时，需要使用热更新。在入口文件处
+
+```js
+import './hmr_test';
+
+if (module.hot) {
+  module.hot.accept('./hmr_test.js', () => {});
+}
+```
+
+那么在项目开发中，每个引入文件都需要这样子配置太过于麻烦。其实 vue、react 都提供了方案去实现
+
+- vue：使用 vue-loader，支持 vue 组件的 HMR
+- react：使用 react-refresh
+
+
+
+HMR 基本原理：
+
+![](/imgs/img19.png)
+
+- webpack-dev-server 会创建两个服务
+  - express 提供静态资源服务，打包后的资源直接被浏览器请求和解析
+  - socket 长连接服务
+- socket 长连接服务
+  - 当服务器监听到对应的模块发生变化时，会生成两个文件.json（manifest文件）和.js文件（update chunk）
+  - 通过 socket 直接将这两个文件主动发送给客户端（浏览器）
+  - 浏览器拿到两个新的文件后，通过HMR runtime机制，加载这两个文件，并且针对修改的模块进行更新
+
+
+
+在 webpack.config.js 中：
+
+```
+module.exports: {
+    devServer: {
+      // 要运行的目录 只是在内存中编译打包，不指向真正的目录
+      contentBase: path.resolve(__dirname, 'dist'),
+      compress: true, // 启动 gzip 压缩
+      progress: true, // 显示进度条
+      port: 3000, // 端口
+      open: true, // 自动打开浏览器
+    }
+}
 ```
 
 #### 8、每次打包前先清空出口目录 clean-webpack-plugin

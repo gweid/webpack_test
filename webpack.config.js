@@ -184,13 +184,14 @@ const webpackConfig = (env, options) => {
                     cacheDirectory: true,
                   }
                 },
-                'eslint-loader'
+                // 'eslint-loader'
               ],
             },
             {
               test: /\.tsx?/,
               exclude: /node_modules/, // 排除 node_modules
-              use: ['babel-loader', 'ts-loader', 'eslint-loader']
+              use: ['babel-loader', 'ts-loader']
+              // use: ['babel-loader', 'ts-loader', 'eslint-loader']
             }
         //   ],
         // },
@@ -202,6 +203,8 @@ const webpackConfig = (env, options) => {
       new CleanWebpackPlugin(),
 
       ...useAnalyz(),
+
+      // new webpack.HotModuleReplacementPlugin(),
 
       new HtmlWebpackPlugin({
         title: 'gweid webpack',
