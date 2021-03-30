@@ -776,7 +776,7 @@ HMR 基本原理：
 
 
 
-**webpack-dev-server 的 publicPath**
+**devServer 的 publicPath**
 
 - 默认值就是 /，也就是说直接访问端口即可访问其中的资源 `http://localhost:8080`
 - 如果将其设置为 /www，那么在访问的时候就需要带上 `http://localhost:8080/www`
@@ -794,6 +794,40 @@ module.exports: {
 ```
 
 > 一般也不怎么去配置 devServer 的 publicPath，直接访问 `http://localhost:8080` 即可
+
+
+
+**devServer 的 contentBase**
+
+用于提供静态资源，只有在你想要提供静态文件时才需要，**可以不是本地打包出来的静态资源**
+
+比如：文件夹中有 /public/mock.json 
+
+```js
+const path = require('path');
+ 
+module.exports = {
+  devServer: {
+    contentBase: path.join(__dirname, 'public')
+  }
+};
+```
+
+访问 http://localhost:8080/mock.json 即可
+
+还可搭配 contentBasePublicPath 使用，比如上面这个例子把 public 文件夹抹平了，实际生产环境，为了区分，需要加上文件前缀用于区分，最终访问的地址 http://localhost:8080/data/mock.json；可以搭配 contentBasePublicPath 来实现
+
+```js
+const path = require('path');
+ 
+module.exports = {
+  //...
+  devServer: {
+    contentBase: path.join(__dirname, 'public'),
+    contentBasePublicPath: '/data'
+  }
+}
+```
 
 
 

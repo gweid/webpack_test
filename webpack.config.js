@@ -82,7 +82,7 @@ const webpackConfig = (env, options) => {
       overlay: true, // 配合 eslint 实时在浏览器弹出语法错误
       publicPath: '', // 所有资源引入公共路径前缀
       // 要运行的目录 只是在内存中编译打包，不指向真正的目录
-      contentBase: path.resolve(__dirname, 'dist'),
+      // contentBase: path.resolve(__dirname, 'dist'),
       watchOptions: {
         // 忽略 node_modules
         ignored: /node_modules/,
