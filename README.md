@@ -821,7 +821,6 @@ module.exports = {
 const path = require('path');
  
 module.exports = {
-  //...
   devServer: {
     contentBase: path.join(__dirname, 'public'),
     contentBasePublicPath: '/data'
@@ -831,20 +830,156 @@ module.exports = {
 
 
 
-在 webpack.config.js 中：
+**devServer 的 hotOnly**
 
-```
-module.exports: {
-    devServer: {
-      // 要运行的目录 只是在内存中编译打包，不指向真正的目录
-      contentBase: path.resolve(__dirname, 'dist'),
-      compress: true, // 启动 gzip 压缩
-      progress: true, // 显示进度条
-      port: 3000, // 端口
-      open: true, // 自动打开浏览器
-    }
+当代码编译失败时，是否刷新整个页面
+
+- 默认情况下当代码编译失败修复后，我们会重新刷新整个页面
+- 如果不希望重新刷新整个页面，而是仅仅更新错误的模块，可以设置 hotOnly 为 true，这样可以保留一些信息
+
+```js
+module.exports = {
+  devServer: {
+    hotOnly: true
+  }
 }
 ```
+
+
+
+**devServer 的 host**
+
+host 主要用来设置主机地址，默认值是 localhost，如果希望其他地方也可以访问，可以设置为 0.0.0.0
+
+localhost 和 0.0.0.0 的区别
+
+- localhost 本质上是一个域名，通常情况下会被解析成 127.0.0.1
+- 0.0.0.0 监听IPV4上所有的地址，再根据端口找到不同的应用程序；比如监听 0.0.0.0 时，在同一个网段下的主机中，通过ip地址是可以访问的
+
+
+
+**devServer 的 port、open、compress**
+
+- port：设置监听的端口，默认情况下是 8080
+
+- open：是否自动打开浏览器，true 即自动打开
+
+- compress：为静态文件开启 gzip，true 开启
+
+  ![](/imgs/img23.png)
+
+
+
+**devServer 的 proxy**
+
+主要作用是解决开发环境下的跨域问题
+
+例如有一个服务，在 http://localhost:8888：
+
+```js
+const express = require('express');
+
+const app = express();
+
+const resList = [
+  {
+    id: '001',
+    name: 'jack',
+    age: 18
+  },
+  {
+    id: '002',
+    name: 'mark',
+    age: 20
+  }
+]
+
+app.get('/api/list', (req, res) => {
+  return res.json(resList);
+})
+
+app.listen('8888', () => {
+  console.log('开启服务: http://localhost:8888');
+})
+```
+
+本地的代码跑在 http://localhost:3000
+
+```js
+import axios from 'axios'
+
+axios
+  .get('http://localhost:8888/api/list')
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  })
+```
+
+这样直接在 3000 端口访问 8888 端口的接口，就会报跨域的错误
+
+此时可以配置 devServer 的 proxy 代理:
+
+```js
+devServer: {
+    proxy: {
+        '/api': {
+          target: 'http://localhost:8888'
+        },
+      },
+}
+```
+
+并且改写本地代码：
+
+```js
+axios
+  .get('/api/list')
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  })
+```
+
+那么就可以实现接口代理
+
+
+
+pathRewrite 作用：默认情况下，写成 `axios.get('/api/list')`，那么代理过去就是访问 `http://localhost:8888/api/list`，现在接口默认是写在 `http://localhost:8888/api/list`,没问题，如果接口是：
+
+```js
+const express = require('express');
+
+const app = express();
+
+const resList = []
+
+app.get('/list', (req, res) => {
+  return res.json(resList);
+})
+```
+
+直接是 app.get('/list')，那么就可以使用 pathRewrite 
+
+```js
+devServer: {
+    proxy: {
+        '/api': {
+          target: 'http://localhost:8888'
+        },
+        // 将 api 替换成 空
+        pathRewrite: {
+          '^/api': '',
+        }
+      },
+}
+```
+
+
 
 #### 8、每次打包前先清空出口目录 clean-webpack-plugin
 

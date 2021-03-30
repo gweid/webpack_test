@@ -81,6 +81,7 @@ const webpackConfig = (env, options) => {
     devServer: {
       overlay: true, // 配合 eslint 实时在浏览器弹出语法错误
       publicPath: '', // 所有资源引入公共路径前缀
+      // host: '0.0.0.0',
       // 要运行的目录 只是在内存中编译打包，不指向真正的目录
       // contentBase: path.resolve(__dirname, 'dist'),
       watchOptions: {
@@ -97,13 +98,13 @@ const webpackConfig = (env, options) => {
 
       // 服务器代理 ---> 解决开发环境中的跨域问题
       proxy: {
-        'api/': {
-          // 一旦 devServer 接收到 /api/xx 形式的请求，就会把请求转发到 http://localhost:3000
-          targrt: 'http://localhost:3000',
+        '/api': {
+          // 一旦 devServer 接收到 /api/xx 形式的请求，就会把请求转发到 http://localhost:8888
+          target: 'http://localhost:8888',
           // 发送请求时，路径重写：将 /api/xxx ---> /xxx
-          pathRewrite: {
-            '^/api': '',
-          },
+          // pathRewrite: {
+          //   '^/api': '',
+          // }
         },
       },
     },

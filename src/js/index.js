@@ -7,6 +7,7 @@ import './hmr_test';
 
 import $ from 'jquery';
 import zepto from 'zepto-webpack';
+import axios from 'axios';
 
 import hello from './hello';
 
@@ -82,3 +83,12 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+axios
+  .get('/api/list')
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  })
