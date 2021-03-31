@@ -1726,6 +1726,75 @@ plugins: [
 
 
 
+#### 17、resolve 模块解析
+
+resolve 用于设置模块如何被解析，比如我们自己写的模块或者从 node_modules 中引入的模块等。
+
+使用了 [enhanced-resolve](https://github.com/webpack/enhanced-resolve) 来解析模块路径，通过这个库，webpack 能解析三种绝对路径
+
+- 绝对路径（/xxx/yy）不需要再做进一步解析
+
+- 相对路径（../../xxx）根据给定的相对路径，会拼接此上下文路径，来生成模块的绝对路径
+
+- 模块路径：在 resolve.modules 指定的所有目录检索模块，默认值是 [node_modules]，可以添加自己的模块
+
+  ```js
+  module.exports = {
+    //...
+    resolve: {
+      modules: ['node_modules', path.resolve(__dirname, 'my_modules')],
+    },
+  };
+  ```
+
+  表示在 node_modules 中找不到就到自己定义的 my_modules 中查找
+
+
+
+例子1：有文件夹 Home，下面有 home.js 文件，我们在引用的时候经常 `import Home from './Home/home'`
+
+，不需要写 .js 也可以，主要是 resolve 解析路径时，如果是文件，并且带有后缀名，那么直接打包，没有后缀名，那么会去匹配 resolve.extensions 里面的后缀名（resolve.extensions 默认是 ['.wasm', '.mjs', '.js', '.json']）,匹配上就打包，匹配不上报错
+
+例子2：有文件夹 Home，下面有 index.js 文件，引用时 `import Home from 'Home'`，而不需要具体到 home.js，是因为 resolve 解析路径时，发现是文件夹，那么根据 resolve.mainFiles 配置选项中指定的文件顺序查找（resolve.mainFiles 默认值是 ['index']）,然后再根据 resolve.extensions 去匹配后缀名
+
+
+
+resolve 常用的属性：
+
+- mainFiles：如果引用时文件夹是，需要指定的文件，默认是 ['index']
+
+  ```js
+  module.exports = {
+    //...
+    resolve: {
+      mainFiles: ['index', 'myIndex']
+    }
+  }
+  ```
+
+- extensions：解析到文件时自动添加扩展名，默认是 ['.wasm', '.mjs', '.js', '.json']
+
+  ```js
+  module.exports = {
+    //...
+    resolve: {
+      extensions: ['.wasm', '.mjs', '.js', '.json', '.vue', 'jsx']
+    }
+  }
+  ```
+
+- alias：配置别名
+
+  ```js
+  resolve: {
+    alias: {
+      '@css': path.resolve(__dirname, 'src/css'),
+    }
+  }
+  ```
+
+
+
 # webpack 性能优化
 
 ## 一、开发环境性能优化
