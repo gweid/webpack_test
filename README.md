@@ -949,7 +949,7 @@ axios
 
 
 
-pathRewrite 作用：默认情况下，写成 `axios.get('/api/list')`，那么代理过去就是访问 `http://localhost:8888/api/list`，现在接口默认是写在 `http://localhost:8888/api/list`,没问题，如果接口是：
+proxy 的 pathRewrite 作用：默认情况下，写成 `axios.get('/api/list')`，那么代理过去就是访问 `http://localhost:8888/api/list`，现在接口默认是写在 `http://localhost:8888/api/list`,没问题，如果接口是：
 
 ```js
 const express = require('express');
@@ -978,6 +978,47 @@ devServer: {
       },
 }
 ```
+
+proxy 的 secure：默认情况下，是**不支持代理到 https ** 的服务器上的，如果需要代理到 https，将 secure 的值设置为 false
+
+```js
+devServer: {
+    proxy: {
+        '/api': {
+          target: 'http://localhost:8888'
+        },
+        // 将 api 替换成 空
+        pathRewrite: {
+          '^/api': '',
+        },
+        secure: false
+      },
+}
+```
+
+
+
+proxy 的 changeOrigin：我们的真实请求，是需要通过 http://localhost:8888 来请求的，但是这里因为使用了代理，所以浏览器里面看到的是通过 http://localhost:3000 发送的请求，这会可能有问题：当服务器开启了请求来源的校验的时候，发现端口是 3000，不符合 8888，那么就会禁止请求。此时就需要将 changeOrigin 的值设置为 true,那么会将代理请求中的 headers 中的 host 属性修改为 proxy 的 target 一致
+
+怎么确定有修改到：webpack-dev-server 开启本地服务是使用的 http-proxy-middleware 这个包，这个包里面使用了 http-proxy，查看这个包源码可以确定
+
+![](/imgs/img24.png)
+
+
+
+**devServer 的 historyApiFallback：**
+
+主要用来处理 SPA 页面在路由跳转之后，进行页面刷新时，返回 404 的错误的问题
+
+```js
+module.exports = {
+    devServer: {
+        historyApiFallback: true
+    }
+}
+```
+
+webpack-dev-server 的 historyApiFallback 是基于[connect-history-api-fallback](https://github.com/bripkens/connect-history-api-fallback) 这个库实现的
 
 
 

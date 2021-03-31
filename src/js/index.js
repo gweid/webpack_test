@@ -84,11 +84,11 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-axios
-  .get('/api/list')
-  .then(res => {
-    console.log(res);
-  })
-  .catch(err => {
-    console.log(err);
-  })
+// axios
+//   .get('/api/list')
+//   .then(res => {
+//     console.log(res);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   })

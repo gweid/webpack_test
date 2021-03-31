@@ -104,7 +104,8 @@ const webpackConfig = (env, options) => {
           // 发送请求时，路径重写：将 /api/xxx ---> /xxx
           // pathRewrite: {
           //   '^/api': '',
-          // }
+          // },
+          changeOrigin: true
         },
       },
     },
