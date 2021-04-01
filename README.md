@@ -412,6 +412,35 @@ module.exports = {
 }
 ```
 
+**上下文：**
+
+context：代表着基础目录，必须为绝对路径，用于从配置中解析入口点
+
+使用场景：
+
+比如，webpack 配置并不是写在 根目录下，而是这样：
+
+|-----config
+
+|-----|------wbepack.config.js
+
+|-----src
+
+|-----|-----index.js
+
+那么就需要加上 context，而不是在入口文件直接 `entry: "../src/index.js"`
+
+```js
+const path = require('path')
+
+module.exports = {
+    context: path.resolve(__dirname, '../'),
+    entry: "./src/index.js",
+}
+```
+
+
+
 **出口：**
 
 - filename：出口文件名
@@ -2071,19 +2100,105 @@ plugins: [
 -   js 使用条件 1、使用 es6 模块化 2、开启 production 环境
 -   tree shaking 可能会把一些 css 干掉，所以需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"] 代表这些文件不会被 tree shaking
 
-#### c、代码分割 code split
+#### c、代码分离
 
--   splitChunk 代码分割, 代码分割还会分析多入口是否有公用文件，有会单独打包成一个 chunk
--   作用: 将一个很大的 js 文件拆分成多个 js 文件，利于并行加载，提高运行速度
+作用: 主要的目的是将代码分离到不同的bundle中，之后我们可以按需加载，或者并行加载这些文件，提高代码加载性能
+
+默认情况下，所有的 JavaScript 代码（业务代码、第三方依赖、暂时没有用到的模块）在首页全部都加载， 就会影响首页的加载速度
+
+webpack 中代码分离的方式主要有三种：
+
+- 通过多入口：entry 配置多入口
+- 防止重复：使用 Entry Dependencies（不推荐） 或者SplitChunksPlugin（官方推荐） 去重和分离代码
+- 动态倒入：通过模块的内联函数调用来分离代码
+
+
+
+**通过多入口：**
+
+主要就是配置不同的入口，对 bundle 进行分割
+
+```js
+const { resolve } = require('path')
+
+module.exports = {
+    entry: {
+        main: './src/main.js',
+        index: './src/index.js'
+    },
+    output: {
+        filename: "bundle.[name].js",
+        path: resolve(__dirname, 'dist')
+    }
+}
+```
+
+
+
+**Entry Dependencies：**
+
+还有一个问题，就是如果 main.js 和 index.js 都引用了 lodash，那么分别打包，会造成两个打包后的文件都引入 lodash，解决：通过 Entry Dependencies(入口依赖)共享 lodash
+
+> 注意：开发中还是更建议直接使用 SplitChunks ,因为如果多个页面用到多个公共的第三方库，这种方式都要手动进行配置，非常不友好
+
+```js
+const { resolve } = require('path')
+
+module.exports = {
+    entry: {
+        main: {
+            import: './src/main.js',
+            dependOn: 'shared'
+        },
+        index: {
+            import: './src/index.js',
+            dependOn: 'shared'
+        },
+        shared: ['lodash']
+    },
+    output: {
+        filename: "bundle.[name].js",
+        path: resolve(__dirname, 'dist')
+    }
+}
+```
+
+![](/imgs/img25.png)
+
+
+
+**代码分割 SplitChunks **
+
+splitChunks 的一些属性：
+
+- chunks：
+
+  - async：代表模块是异步进行加载的，才会进行分离（默认就是 async）,比如：
+
+    ```js
+    import('lodash').then(res => {})
+    ```
+
+  - inital：模块是同步加载的，进行分离
+
+  - all：所有情况（一般设置为 all 即可）
+
+- minSize：只有大于这个值的包才会被拆分
+
+- minChunks：这个包至少被引用几次才会拆分
 
 ```
 optimization: {
     // 代码分割
     splitChunks: {
-        chunks: 'all'
+        chunks: 'all',
+        minSize: 30 * 1024, // 只有大于 30kb 的 chunks 才进行分割
+        minChunks: 1, // 这个 chunks 至少被引用一次才分割
     }
 }
 ```
+
+
 
 #### d、懒加载和预加载
 
