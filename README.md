@@ -2188,15 +2188,44 @@ splitChunks 的一些属性：
 - minChunks：这个包至少被引用几次才会拆分
 
 ```
-optimization: {
-    // 代码分割
-    splitChunks: {
-        chunks: 'all',
-        minSize: 30 * 1024, // 只有大于 30kb 的 chunks 才进行分割
-        minChunks: 1, // 这个 chunks 至少被引用一次才分割
+module.exports = {
+    optimization: {
+        // 代码分割
+        splitChunks: {
+            chunks: 'all',
+            minSize: 30 * 1024, // 只有大于 30kb 的 chunks 才进行分割
+            minChunks: 1, // 这个 chunks 至少被引用一次才分割
+        }
     }
 }
 ```
+
+- cacheGroups：用于对拆分的包就行分组，比如一个lodash在拆分之后，并不会立即打包，而是会等到有没有其他符合规则的包一起来打包
+
+```js
+module.exports = {
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    // 匹配规则：如果是从 node_modules 中引入的
+                    test: /[\\/]node_modules[\\/]/,
+                    filename: 'js/[name]_[hash:4].js'
+                },
+                // 如果想要将我们自己写的文件单独打包，那么可以再配置(要注意于前面设置的包大小限制 minSize 配合)
+                xxx: {
+                    test: /xxx/,
+                    filename: 'js/[name]_[hash:4].js'
+                }
+            }
+        }
+    }
+}
+```
+
+![](/imgs/img26.png)
+
+在使用 SplitChunks  的时候，一般很少去手动设置这些属性，只需要设置 chunks： ‘all’ 基本可以，其他的使用默认设置即可。还有当需要单独对自己写的模块进行打包，设置一下 cacheGroups 即可。例如 react 跟 vue 的脚手架对 SplitChunks  的设置都比较简单
 
 
 

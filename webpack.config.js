@@ -287,7 +287,23 @@ const webpackConfig = (env, options) => {
         chunks: 'all',
         minSize: 30 * 1024, // 只有大于 30kb 的 chunks 才进行分割
         minChunks: 1, // 这个 chunks 至少被引用一次才分割
+
+        // cacheGroups: 用于对拆分的包就行分组，比如一个lodash在拆分之后，并不会立即打包
+        // 而是会等到有没有其他符合规则的包一起来打包
+        // cacheGroups: {
+        //   vendors: {
+        //     // 匹配规则：如果是从 node_modules 中引入的
+        //     test: /[\\/]node_modules[\\/]/,
+        //     filename: 'js/[name]_[hash:4].js'
+        //   },
+        //   // 如果想要将我们自己写的文件单独打包，那么可以再配置(要注意于前面设置的包大小限制 minSize 配合)
+        //   // xxx: {
+        //   //   test: /xxx/,
+        //   //   filename: 'js/[name]_[hash:4].js'
+        //   // }
+        // }
       },
+
       // 解决代码分割缓存失败
       // runtimeChunk: {
       //   name: (entrypoint) => `runtime-${entrypoint.name}`,

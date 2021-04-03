@@ -10,6 +10,10 @@ import zepto from 'zepto-webpack';
 import axios from 'axios';
 
 import hello from './hello';
+import { myJoin, getCurrentDay } from './split';
+
+myJoin('hello');
+getCurrentDay()
 
 if (module.hot) {
   module.hot.accept('./hmr_test.js', () => {});
