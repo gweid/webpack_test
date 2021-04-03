@@ -2229,11 +2229,66 @@ module.exports = {
 
 
 
+拓展：
+
+一般像 vue 脚手架，**同步的代码**，通过 SplitChunks 最多就分离出来 4 个文件，分别是：
+
+- main.bundle.js
+- vendor_chunks.js：第三方包
+- common_chunks.js：自己的模块被**多个入口多次引用**（一般 spa 单页面也不会有这个文件）
+- runtime.js
+
+
+
+**动态导入(dynamic import)：**
+
+通过动态导入的方式也可以进行代码分离，webpack 对于异步导入的代码都会进行单独的打包
+
+- 使用 ECMAScript 中的 import() 语法来完成，也是目前推荐的方式
+
+  ```js
+  import('./sub.js').then(res => {
+      
+  })
+  ```
+
+- 使用 webpack 遗留的 require.ensure，目前已经不推荐使用
+
+
+
+动态导入的打包文件命名需要使用到下面两者配合：
+
+- opuput.chunkFilename
+
+- 魔法注释 /* webpackChunkName:  '名字' */
+
+在 webpack.config.js 中：
+
+```js
+module.exports = {
+    chunkFilename: 'js/[name]_chunk.js'
+}
+```
+
+在 index.js 中
+
+```js
+import(/* webpackChunkName: 'sub' */ './sub').then(({ addSub }) => {
+    console.log(addSub(1, 7))
+  })
+```
+
+![](/imgs/img27.png)
+
+
+
+
+
 #### d、懒加载和预加载
 
-```
-index.js 中
+在  index.js 中：
 
+```
 const btn = document.querySelector('#btn')
 btn.addEventListener('click', (e) => {
   // 懒加载: 体验稍微差，兼容性好一点

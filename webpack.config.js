@@ -69,11 +69,11 @@ const webpackConfig = (env, options) => {
       // filename: 'js/bundle.[contenthash:8].js', // 出口文件名 使用 hash 值
       filename:
         MODE === 'development'
-          ? 'js/bundle.[hash:8].js'
-          : 'js/bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
+          ? 'js/[name]_bundle.[hash:8].js'
+          : 'js/[name]_bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
       path: path.resolve(__dirname, 'dist'), // 全局路径，这个必须是绝对路径
       publicPath: MODE === 'development' ? '' : '', // 所有资源引入公共路径前缀
-      chunkFilename: 'js/[name]_chunk.js', // 对非入口的 chunk 命名
+      chunkFilename: 'js/[name]_chunk.js', // 对非入口的 chunk 命名（例如异步代码单独打包出来的文件，配合 /* webpackChunkName: 'sub' */ 这个魔法注释）
       // library: '[name]', // 整个库向外暴露的名字
       // libraryTargrt: 'window', // 变量名添加到什么属性上
     },

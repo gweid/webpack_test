@@ -59,16 +59,13 @@ btn.addEventListener('click', () => {
   //   console.log(addSub(1, 7))
   // })
 
-  // 懒加载代码分割
-  // import(/* webpackChunkName: 'sub' */'./sub').then(({ addSub }) => {
+  // 懒加载代码分割 /* webpackChunkName: 'sub' */ 通过魔法注释配合 output.chunkFilename 进行打包出去的文件进行命名
+  // import(/* webpackChunkName: 'sub' */ './sub').then(({ addSub }) => {
   //   console.log(addSub(1, 7))
   // })
 
   // 预加载  webpackPrefetch: true
-  import(/* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(
-    ({
-      addSub,
-    }) => {
+  import(/* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(({ addSub }) => {
       console.log(addSub(1, 9));
     },
   );
