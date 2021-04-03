@@ -1780,17 +1780,15 @@ resolve 用于设置模块如何被解析，比如我们自己写的模块或者
 
 
 
-例子1：有文件夹 Home，下面有 home.js 文件，我们在引用的时候经常 `import Home from './Home/home'`
+**例子1：**有文件夹 Home，下面有 home.js 文件，我们在引用的时候经常 `import Home from './Home/home'`，不需要写 .js 也可以，主要是 resolve 解析路径时，如果是文件，并且带有后缀名，那么直接打包，没有后缀名，那么会去匹配 resolve.extensions 里面的后缀名（resolve.extensions 默认是 ['.wasm', '.mjs', '.js', '.json']）,匹配上就打包，匹配不上报错
 
-，不需要写 .js 也可以，主要是 resolve 解析路径时，如果是文件，并且带有后缀名，那么直接打包，没有后缀名，那么会去匹配 resolve.extensions 里面的后缀名（resolve.extensions 默认是 ['.wasm', '.mjs', '.js', '.json']）,匹配上就打包，匹配不上报错
-
-例子2：有文件夹 Home，下面有 index.js 文件，引用时 `import Home from 'Home'`，而不需要具体到 home.js，是因为 resolve 解析路径时，发现是文件夹，那么根据 resolve.mainFiles 配置选项中指定的文件顺序查找（resolve.mainFiles 默认值是 ['index']）,然后再根据 resolve.extensions 去匹配后缀名
+**例子2：**有文件夹 Home，下面有 index.js 文件，引用时 `import Home from 'Home'`，而不需要具体到 index.js，是因为 resolve 解析路径时，发现是文件夹，那么根据 resolve.mainFiles 配置选项中指定的文件顺序查找（resolve.mainFiles 默认值是 ['index']）,然后再根据 resolve.extensions 去匹配后缀名
 
 
 
 resolve 常用的属性：
 
-- mainFiles：如果引用时文件夹是，需要指定的文件，默认是 ['index']
+- mainFiles：如果引用是文件夹时，需要指定的文件，默认是 ['index']
 
   ```js
   module.exports = {
