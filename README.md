@@ -2284,29 +2284,42 @@ import(/* webpackChunkName: 'sub' */ './sub').then(({ addSub }) => {
 
 #### d、懒加载和预加载
 
+**懒加载：**体验稍微差，兼容性好一点
+
 在  index.js 中：
 
 ```
 const btn = document.querySelector('#btn')
+
 btn.addEventListener('click', (e) => {
-  // 懒加载: 体验稍微差，兼容性好一点
-  // import('./sub').then(({ addSub }) => {
-  //   console.log(addSub(1, 7))
-  // })
+  import(/* webpackChunkName: 'sub' */'./sub').then(({ addSub }) => {
+    console.log('懒加载', addSub(1, 7))
+  })
+})
+```
 
-  // 懒加载代码分割
-  // import(/* webpackChunkName: 'sub' */'./sub').then(({ addSub }) => {
-  //   console.log(addSub(1, 7))
-  // })
+懒加载在初次请求的时候并没有去请求 sub 模块，而是在点击按钮的时候才去加载模块
 
+![](/imgs/img28.png)
+
+**预加载：**体验好，兼容性差
+
+```js
+const btn = document.querySelector('#btn')
+
+btn.addEventListener('click', (e) => {
   // 预加载：体验好，兼容性差
   import(/* webpackChunkName: 'sub', webpackPrefetch: true */ './sub').then(
     ({ addSub }) => {
-      console.log(addSub(1, 9))
+      console.log('预加载', addSub(1, 9))
     }
   )
 })
 ```
+
+预加载会在服务器空闲的时候，去把 sub 模块加载出来
+
+![](/imgs/img29.png)
 
 #### ｅ、pwa 渐进式网络开发应用程序 离线可访问
 
