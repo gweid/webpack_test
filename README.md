@@ -2317,11 +2317,25 @@ btn.addEventListener('click', (e) => {
 })
 ```
 
-预加载会在服务器空闲的时候，去把 sub 模块加载出来
+预加载会在**浏览器空闲**的时候，去把 sub 模块加载出来
 
 ![](/imgs/img29.png)
 
-#### ｅ、pwa 渐进式网络开发应用程序 离线可访问
+#### e、optimization. runtimeChunk
+
+optimization. runtimeChunk 主要是将运行时的代码进行抽离（也就是将运行时的代码从主包 bundle 中抽离出来）
+
+- 运行时代码：如 `import('abc').then(res=>{})`这种异步加载的代码，在 webpack 中即为运行时代码
+
+这样做的好处是：抽离出来后，有利于浏览器的缓存策略（线上更新版本时，充分利用浏览器缓存，使用户感知的影响到最低）；即修改了业务代码 main，那么 runtime 中代码不需要重新加载，反之也是
+
+```js
+runtimeChunk: {
+  name: entrypoint => `runtime_${entrypoint.name}`
+},
+```
+
+#### f、pwa 渐进式网络开发应用程序 离线可访问
 
 -   可靠 - 即使在网络不稳定甚至断网的环境下，也能瞬间加载并展现
 -   用户体验 - 快速响应，具有平滑的过渡动画及用户操作的反馈
@@ -2360,7 +2374,7 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
-#### f、使用 cdn
+#### g、使用 cdn
 
 ```
 npm i html-webpack-externals-plugin -D

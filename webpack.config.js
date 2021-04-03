@@ -304,10 +304,10 @@ const webpackConfig = (env, options) => {
         // }
       },
 
-      // 解决代码分割缓存失败
-      // runtimeChunk: {
-      //   name: (entrypoint) => `runtime-${entrypoint.name}`,
-      // },
+      // 将运行时的代码进行抽离
+      runtimeChunk: {
+        name: entrypoint => `runtime_${entrypoint.name}`
+      },
 
       // 配置生产环境的压缩方案
       minimizer: [
