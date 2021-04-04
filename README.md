@@ -2079,7 +2079,13 @@ resolve: {
 
 #### a、文件资源缓存
 
--   主要就是借助浏览器缓存，服务端设置资源缓存，webpack 为 js 和 css 等文件添加文件 hash-->contenthash
+主要就是借助浏览器缓存，服务端设置资源缓存，webpack 为 js 和 css 等文件添加文件 hash
+
+webpack 的三种 hash（hash 本身是通过 MD4 的散列函数处理后，生成一个128位的hash值）：
+
+- hash：hash 是对 webpack 整个一次构建而言，在 webpack 构建中，文件都会带上对应的MD5 值，构建生成的文件hash值都是一样的。如果出口是 hash，那么一旦针对项目中任何一个文件的修改，都会构建整个项目，重新获取hash值。如果有目的性的缓存就会失败
+- chunkhash：会根据不同的入口（entry）进行借来解析来生成hash值
+- contenthash：文件 hash，具体到某一个文件
 
 ```
 output: {

@@ -241,7 +241,7 @@ const webpackConfig = (env, options) => {
 
       // 抽离 css  将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间
       new MiniCssExtractPlugin({
-        filename: 'css/main.[contenthash:8].css', // 分离到到 main.css  使用 contenthash 值
+        filename: 'css/[name].[contenthash:8].css', // 分离到到 main.css  使用 contenthash 值
       }),
       // 压缩 css
       new OptimizeCssAssetsWebpackPlugin(),

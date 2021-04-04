@@ -1,7 +1,9 @@
+// 要想不要被 tree shaking 干掉这样引用的 css，需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"]
 import '../css/index.css';
 import '../css/index.scss';
 
-import './jsx_index.jsx';
+// 直接这样通过 es6 的 import引用，在生产环境会被 tree shaking 干掉，可以使用
+import './jsx_index.jsx'; 
 import './ts_index.ts';
 import './hmr_test';
 
