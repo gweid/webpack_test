@@ -122,7 +122,7 @@ const webpackConfig = (env, options) => {
     // devtool: MODE === 'development' ? 'cheap-module-eval-source-map' : 'none',
     devtool: MODE === 'development' ? 'source-map' : 'none',
 
-    // 主要用于 cdn 引入的包, 忽略打包
+    // 主要用于 cdn 引入的包, 忽略打包（这种方式需要在 index.html 中的 script 中引入 cdn 地址）
     // externals: {
     //     // 要忽略的库名---npm 包名
     //     jquery: "jQuery"

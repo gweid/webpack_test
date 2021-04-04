@@ -2376,9 +2376,56 @@ if ('serviceWorker' in navigator) {
 
 #### g、使用 cdn
 
-```
+CDN：内容分发网络，指通过相互连接的网络系统，利用最靠近每个用户的服务器，更快、更可靠地将音乐、图片、视频、应用程序及其他文件发送给用户，来提供高性能、可扩展性及低成本的网络内容传递给用户
+
+**CDN 基本原理：**
+
+首先，把静态资源放到源节点里面。
+
+当用户张三需要使用到某一个图片，那么就会先到最近的边缘节点查找，如果附近地区之前有叫李四的用户访问过这张图片，那么这张图片就会缓存在这两者最近的边缘节点，那么就可以直接在边缘节点把这张图片返回给李四；如果在边缘节点没找到，那么就回去父节点，父节点没有，就会去源节点查找。在源节点找到，就会传给父节点，父节点会备份一份，然后传给边缘节点，边缘节点再备份，最后返回给用户
+
+![](/imgs/img30.png)
+
+一般在开发中，使用 CDN 主要是两种方式
+
+- 打包的所有静态资源，放到 CDN 服 
+
+  务器，用户所有资源都是通过 CDN 服务器加 
+
+  载的
+
+- 一些第三方资源放到CDN服务器上
+
+**静态资源放到 CDN 服务器：**
+
+- 首先需要购买 CDN 服务器，国内一般阿里、腾讯的 CDN 服务器
+
+- 然后将资源放到 CDN 服务器
+
+- webpack 通过修改 publicPath，在打包时添加上自己的CDN地址
+
+  ```js
+  module.exports = {
+      output: {
+          publicPath: 'https://www.xxx.com/cdn/'
+      }
+  }
+  ```
+
+**webpack 中第三方资源使用 CDN 的方法：**
+
+**方法1：使用html-webpack-externals-plugin**
+
+安装：
+
+```js
 npm i html-webpack-externals-plugin -D
 
+```
+
+使用：
+
+```
 plugins: [
     new HtmlWebpackExternalsPlugin({
         externals: [{
@@ -2388,6 +2435,36 @@ plugins: [
         }]
     })
 ]
+```
+
+**方法2：直接使用外部扩展 externals**
+
+外部扩展 externals 的作用：**防止**将某些 `import` 的包(package) **打包**到 bundle 中，而是在运行时(runtime)再去从外部获取这些*扩展依赖(external dependencies)*
+
+首先在 index.html 中引入：
+
+```js
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+```
+
+然后在 webpack.config.js 中配置：
+
+```js
+module.exports = {
+    externals: {
+        // 要忽略的库名---npm 包名
+        // 右边是填这个库暴露出来的一个全局对象
+        jquery: "jQuery"
+    }
+}
+```
+
+当在开发环境不需要使用 CDN 时，可以利用 ejs 模板的条件判断：
+
+```js
+<% if (process.env.NODE_ENV !== 'production') { %>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"</script>
+<% } %>
 ```
 
 
