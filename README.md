@@ -2822,7 +2822,53 @@ plugins: [
 
 # webpack 拓展
 
-### 1、一些实用的 plugins
+### 1、封装 Library
+
+利用 webpack 打包一个我们自己的库文件
+
+在 index.js 中
+
+```js
+import * as math from "./lib/math";
+import * as format from './lib/format'
+
+export {
+  math,
+  format
+}
+```
+
+在 webpack.config.js 中：
+
+```js
+const path = require('path')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+
+module.exports = {
+  entry: './src/index.js',
+  devtool: false,
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'gweid-utils.js',
+    libraryTarget: 'umd', // 使用 umd
+    library: 'gweidUtils', // 包名
+    globalObject: 'this'
+  },
+  plugins: [
+    new CleanWebpackPlugin()
+  ]
+}
+```
+
+umd：指打包出来的东西既支持 amd，又支持 CommonJs，也支持浏览器直接使用
+
+- CommonJs 又分为社区 CommomJs 和 node 的 CommonJs；node 的 CommonJs：有 module 对象 和 module.exports
+
+分析打包后的代码，通过 umd 支持不同模块化：
+
+![](/imgs/img33.png)
+
+globalObject: 'this' 这里的 this 设置的就是上面图片中自执行函数的 this
 
 
 

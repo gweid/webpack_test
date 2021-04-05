@@ -1,0 +1,17 @@
+{
+  "name": "cls",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "dev": "webpack --mode development --progress",
+    "build": "webpack --mode production --progress"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "webpack": "^5.24.4",
+    "webpack-cli": "^4.5.0"
+  }
+}

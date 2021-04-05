@@ -8,6 +8,8 @@ test/treeShaking/node_modules
 test/treeShaking/dist
 test/vue-test/node_modules
 test/vue-test/dist
+test/libraryTest/node_modules
+test/libraryTest/dist
 
 # Log files
 npm-debug.log*
