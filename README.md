@@ -605,6 +605,14 @@ npm i html-webpack-plugin -D
 
 使用：
 
+- template：以什么为模板
+- inject：打包后的资源插入的位置
+  - true：默认值
+  - false：不注入
+  - body：注入 body 中
+  - head：注入 head 中
+- cache：设置为 true，只有当文件改变时，才会生成新的文件（默认值也是true） 
+
 ```
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
@@ -1735,16 +1743,18 @@ npm i html-webpack-plugin -D
 
 使用：
 
+> 使用 minify 默认会使用一个插件 html-minifier-terser
+
 ```
 plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './src/index.html', // 以什么为模板
-      // 压缩 HTML 的配置
-      minify: {
+      // 压缩 HTML 的配置(开发环境不需要压缩)
+      minify: MODE === 'production' ? {
         removeComments: true, // 是否去掉注释
         collapseWhitespace: true, // 折叠成一行
-      },
+      } : false,
     })
 ]
 ```
@@ -2297,7 +2307,7 @@ import '../css/index.css';
 import './test';
 ```
 
-这样，css 是希望可以这样引入，不希望被 tree shaking掉，而 js 不希望这样子引用而直接 tree shaking 掉，那么就可以配置 package.json 的 sideEffects，用来告诉哪些模块有副作用，不能 tree shaking 掉
+这样，css 是希望可以这样引入，不要被 tree shaking 掉，而 js 不希望这样子引用而直接 tree shaking 掉，那么就可以配置 package.json 的 sideEffects，用来告诉哪些模块有副作用，不能 tree shaking 掉
 
 ```js
 {
@@ -2309,6 +2319,12 @@ import './test';
 ```
 
 这样子代表 css、scss 文件不会被 tree shaking，而没有配置的 js 类型文件、例如 `import './test';` 将被 tree shaking 掉。*注意：是在生产环境*
+
+
+
+所以，总结在真实项目中，production 默认就开启了 useExports，再手动配置 package.json 的 sideEffects 即可
+
+
 
 #### c、代码分离
 
@@ -2678,6 +2694,52 @@ module.exports = {
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.min.js"</script>
 <% } %>
 ```
+
+#### h、http 压缩
+
+http 压缩是指在服务器和浏览器间传输压缩文本内容的方法。http 压缩通常采用 gzip 压缩算法压缩html、js、css 等文件。压缩的最大好处就是降低了网络传输的数据量，从而提高客户端浏览器的访问速度。当然，同时也会增加一点服务器的负担
+
+**http 压缩的流程：**
+
+- 可以在服务端进行压缩 gzip，可以了在前端通过 webpack 压缩成 gzip
+
+- 兼容的浏览器在向服务器发送请求时，会告知服务器自己支持哪些压缩格式
+
+  ![](/imgs/img32.png)
+
+- 服务器在浏览器支持的压缩格式下，直接返回对应的压缩后的文件(index.js.gz)，然后浏览器会自动对 gz 文件进行解压，生成 js 文件
+
+**目前常用的 http 压缩格式：**
+
+- gzip – GNU zip格式（定义于RFC 1952），是目前使用比较广泛的压缩算法
+- deflate – 基于deflate算法（定义于RFC 1951）的压缩，使用zlib数据格式封装
+- br – 一种新的开源压缩算法，专为HTTP内容的编码而设计（目前兼容性没有上面两个好）
+
+**在 webpack 中实现 http 压缩：**
+
+使用 compression-webpack-plugin 进行 http 压缩
+
+安装：
+
+```js
+npm install compression-webpack-plugin -D
+```
+
+使用：
+
+> webpack 4 版本只能使用 compression-webpack-plugin 5.0.1 版本一下的，compression-webpack-plugin 5.0.1一下的会跟 CleanWebpackPlugin 冲突
+
+```js
+plugins: [
+    new CompressionWebpackPlugin({
+        test: /\.js$/, // 匹配哪些文件需要压缩
+        minRatio: 0.7, // 压缩比例
+        algorithm: 'gzip', // 压缩格式
+    }),
+]
+```
+
+一般情况下， html、图片不需要压缩，而 css 中可能有使用背景图，也不压缩
 
 
 

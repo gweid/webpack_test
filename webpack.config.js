@@ -213,11 +213,11 @@ const webpackConfig = (env, options) => {
         title: 'gweid webpack',
         filename: 'index.html',
         template: './public/index.html', // 以什么为模板
-        // 压缩 HTML 的配置
-        minify: {
+        // 压缩 HTML 的配置(开发环境不需要压缩)
+        minify: MODE === 'production' ? {
           removeComments: true, // 是否去掉注释
           collapseWhitespace: true, // 折叠成一行
-        },
+        } : false,
       }),
 
       // 设置全局常量
