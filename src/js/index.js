@@ -1,4 +1,4 @@
-// 要想不要被 tree shaking 干掉这样引用的 css，需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"]
+// 虽然设置了 sideEffects 对 css 进行 tree shaking，但是使用了 css 抽离，所以
 import '../css/index.css';
 import '../css/index.scss';
 

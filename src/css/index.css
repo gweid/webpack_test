@@ -33,6 +33,12 @@ p {
     background-size: 100% 100%;
 }
 
+.img4 {
+    background-image: url("../images/angular.jpg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
 .set-image {
     display: flex;
 }

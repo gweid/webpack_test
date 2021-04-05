@@ -1275,8 +1275,6 @@ npm i postcss-preset-env -D
 }
 ```
 
-
-
 #### 11、压缩 css 
 
 **使用 css-minimizer-webpack-plugin （官方使用）**
@@ -2213,8 +2211,104 @@ plugins: [
 
 #### b、tree shaking 作用：去除无用代码，减少代码体积
 
--   js 使用条件 1、使用 es6 模块化 2、开启 production 环境
--   tree shaking 可能会把一些 css 干掉，所以需要在 package.json 中配置 "sideEffects": ["*.css", "*.scss"] 代表这些文件不会被 tree shaking
+tree shaking：摇树，用于消除未调用的代码，主要是 ESModule 进行 tree shaking
+
+在 webpack5 中，也提供了对部分 CommomJs 的tree shaking 能力
+
+
+
+在 webpack4 以上，**对 js 使用 tree shaking 有两种不同的方式**：
+
+- usedExports：通过标记某些函数是否被使用，之后通过 Terser 来进行优化的
+- sideEffects：查看某个文件是否有副作用，有副作用，就不进行 tree shaking
+
+**useExports 方式：**
+
+- 使用 es6 模块化 
+
+- 开启 usedExports 和 treser
+
+  ```js
+  module.exports = {
+      optimization: {
+          usedExports: true,
+          minimize: true
+      }
+  }
+  ```
+
+*默认生产环境 production 下，usedExports 和 minimize 值都是 true，即生产环境不需要额外配置就支持 usedExports 方式的 tree shaking*
+
+源代码：
+
+```js
+import { sum, mul } from "./math";
+
+console.log(sum(20, 30));
+```
+
+*引用了 mul， 没有使用*
+
+打包后的代码：
+
+```js
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/math.js":
+/*!*********************!*\
+  !*** ./src/math.js ***!
+  \*********************/
+/***/ (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "sum": function () { return /* binding */ sum; }
+  /* harmony export */
+});
+
+        /* unused harmony export mul */
+        const sum = (num1, num2) => {
+          return num1 + num2;
+        }
+
+        const mul = (num1, num2) => {
+          return num1 * num2;
+        }
+
+
+        /***/
+})
+    /******/
+})
+```
+
+可以发现，`__webpack_require__.d` 中直接没有了 mul 函数的代码。在下面有打上魔法注释：`/* unused harmony export mul */`，这个主要是告诉 terser，可以删除这个没有被使用的函数
+
+通过开启 treser，就可以将 mul 删除
+
+
+
+**sideEffects 方式：**
+
+比如，在 index.js 中，直接：
+
+```js
+import '../css/index.css';
+
+import './test';
+```
+
+这样，css 是希望可以这样引入，不希望被 tree shaking掉，而 js 不希望这样子引用而直接 tree shaking 掉，那么就可以配置 package.json 的 sideEffects，用来告诉哪些模块有副作用，不能 tree shaking 掉
+
+```js
+{
+    "sideEffects": [
+        "*.css",
+        "*.scss"
+    ]
+}
+```
+
+这样子代表 css、scss 文件不会被 tree shaking，而没有配置的 js 类型文件、例如 `import './test';` 将被 tree shaking 掉。*注意：是在生产环境*
 
 #### c、代码分离
 

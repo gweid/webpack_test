@@ -4,6 +4,8 @@ node_modules
 dll
 test/module/node_modules
 test/module/dist
+test/treeShaking/node_modules
+test/treeShaking/dist
 test/vue-test/node_modules
 test/vue-test/dist
 
