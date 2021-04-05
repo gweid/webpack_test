@@ -73,7 +73,7 @@ const webpackConfig = (env, options) => {
           : 'js/[name]_bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
       path: path.resolve(__dirname, 'dist'), // 全局路径，这个必须是绝对路径
       publicPath: MODE === 'development' ? '' : '', // 所有资源引入公共路径前缀
-      chunkFilename: 'js/[name]_chunk.js', // 对非入口的 chunk 命名（例如异步代码单独打包出来的文件，配合 /* webpackChunkName: 'sub' */ 这个魔法注释）
+      chunkFilename: 'js/[name]_chunk.[contenthash:8].js', // 对非入口的 chunk 命名（例如异步代码单独打包出来的文件，配合 /* webpackChunkName: 'sub' */ 这个魔法注释）
       // library: '[name]', // 整个库向外暴露的名字
       // libraryTargrt: 'window', // 变量名添加到什么属性上
     },
@@ -271,13 +271,13 @@ const webpackConfig = (env, options) => {
         ],
       }),
 
-      // 使用 dll
+      // 通过 DllReferencePlugin 插件告知要使用的 DLL 库
       new webpack.DllReferencePlugin({
         manifest: path.resolve(__dirname, 'dll', 'zepto.manifest.json'),
       }),
-      // 通过这样引入 dll 后的第三方库
+      // 通过 AddAssetHtmlWebpackPlugin 将 dll 库引入到 html 模板中
       new AddAssetHtmlWebpackPlugin({
-        filepath: path.resolve(__dirname, 'dll', 'zepto.dll.js'),
+        filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
       }),
     ],
 

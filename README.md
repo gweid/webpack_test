@@ -2015,51 +2015,79 @@ npm i thread-loader -D
 
 #### d、动态链接库 dll
 
--   主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
+主要就是对某一些第三方库进行单独打包, 后续打包不需要再打包第三方库，直接使用 dll
 
-```
-// 新建 webpack.dll.config.js, 并且在 package.json 配置 dll 启动命令   "dll": "webpack --config webpack.dll.config.js --mode production"
+dll 的使用分为两步：
 
-// webpack.dll.config.js
-const path = require('path')
-const webpack = require('webpack')
-const {
-    CleanWebpackPlugin
-} = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
+- 首先，打包一个 dll 库
+- 然后，在项目中引入 dll 库
 
-module.exports = {
-    entry: {
-        zepto: ['zepto-webpack']
-    },
-    output: {
-        filename: "[name].dll.js",
-        path: path.resolve(__dirname, "dll"),
-        library: "dll_[name]"
-    },
-    plugins: [
-        new CleanWebpackPlugin(),
+打包一个 dll 库：
 
-        new webpack.DllPlugin({
-            name: 'dll_[name]',
-            path: path.resolve(__dirname, "dll", "[name].manifest.json")
-        })
-    ]
-}
+- 新建 webpack.dll.config.js，里面内容：
 
-// webpa|ck.config.js 中使用
-npm i add-asset-html-webpack-plugin -D
+  ```js
+  const path = require('path')
+  const webpack = require('webpack')
+  const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+  
+  module.exports = {
+      entry: {
+          zepto: ['zepto-webpack'] // zepto 在 webpack 中使用用的是 zepto-webpack 这个包
+      },
+      output: {
+          path: path.resolve(__dirname, "dll"),
+          filename: "dll_[name].js", // name 取到的值就是 entry 的 key
+          library: "dll_[name]"
+      },
+      plugins: [
+          new CleanWebpackPlugin(),
+          // 生成一份 manifest 文件
+          new webpack.DllPlugin({
+              name: 'dll_[name]', // 这里的 name 要与 output 的 library 一致
+              path: path.resolve(__dirname, "dll", "[name].manifest.json")
+          })
+      ]
+  }
+  ```
 
-plugins: [
-    // 使用 dll
-    new webpack.DllReferencePlugin({
-        manifest: path.resolve(__dirname, "dll", "zepto.manifest.json")
-    }),
-    // 通过这样引入 dll 后的第三方库
-    new AddAssetHtmlWebpackPlugin({
-        filepath: path.resolve(__dirname, "dll", "zepto.dll.js")
-    }),
-]
-```
+- package.json 配置 dll 启动命令
+
+  ```js
+  "scripts": {
+      "dll": "webpack --config webpack.dll.config.js --mode production --progress",
+  }
+  ```
+
+在项目中引入 dll 库：
+
+- 安装 add-asset-html-webpack-plugin
+
+  ```js
+  npm i add-asset-html-webpack-plugin -D
+  ```
+
+  add-asset-html-webpack-plugin 主要做的是：
+
+  - 将 dll/dll_zepto.js 复制到 dist 中
+  - 在 index.html 中引用 dll_zepto.js
+
+- 在 webpack.config.js 中：
+
+  ```js
+  plugins: [
+      // 通过 DllReferencePlugin 插件告知要使用的 DLL 库
+      new webpack.DllReferencePlugin({
+          manifest: path.resolve(__dirname, 'dll', 'zepto.manifest.json'),
+      }),
+      // 通过 AddAssetHtmlWebpackPlugin 将 dll 库引入到 html 模板中
+      new AddAssetHtmlWebpackPlugin({
+          filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
+      })
+  ]
+  ```
+
+> 对于 dll，在升级到 webpack4 之后，vue 和 react 的脚手架都不再使用 dll，vue 作者尤雨溪的的答复是：webpack4 已经提供了足够的性能，不需要再花费额外的心思去维护 dll
 
 #### e、配置文件别名
 
