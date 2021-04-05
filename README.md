@@ -1277,14 +1277,37 @@ npm i postcss-preset-env -D
 
 
 
-#### 11、压缩 css 使用 optimize-css-assets-webpack-plugin
+#### 11、压缩 css 
+
+**使用 css-minimizer-webpack-plugin （官方使用）**
 
 ```
-const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin') // 压缩 css
+npm i css-minimizer-webpack-plugin -D
+```
 
+```js
+const CssMinimizerWebpackPlugin = require("css-minimizer-webpack-plugin")
+
+module.exports = {
+    optimization： {
+        // minimize: true, // 开启或者关闭 minimizer，生产环境默认开启
+        minimizer: [
+            new CssMinimizerWebpackPlugin() // 使用默认配置已经足够
+        ]
+    }
+}
+```
+
+**使用 optimize-css-assets-webpack-plugin**
+
+```js
+npm i optimize-css-assets-webpack-plugin -D
+```
+
+```
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 plugins: [
-    // 直接使用默认配置已经足够
-    new OptimizeCssAssetsWebpackPlugin()
+    new OptimizeCssAssetsWebpackPlugin() // 直接使用默认配置已经足够
 ]
 ```
 
@@ -1647,11 +1670,72 @@ module.exports = {
 
 #### 13、js 压缩
 
--   在 webpack4, 只要将 mode 改为 production 将自动压缩 js 代码 或者在 package.json 中把 mode 配置
+在 webpack4，**只要将 mode 改为 production 将自动压缩 js 代码** 或者在 package.json 中把 mode 配置。主要是 webpack4 以上如果是生产环境，默认使用的是 terser 去对代码进行压缩
+
+> 早期，很多使用 uglify-js 来对代码进行压缩，但是目前已经不再维护，并且不支持ES6+的语法，Terser 是从 uglify-es fork 过来的，并且保留它原来的大部分API以及适配 uglify-es 和 uglify-js@3 等
+
+terser 是一个独立的工具，直接命令行也是可以使用，但是现在前端工程化的时代，一般搭配 webpack 之类的打包工具使用
+
+如果想要在 webpack 中自定义 terser，那么可以使用 terser-webpack-plugin 插件
+
+安装：
+
+```js
+npm i terser-webpack-plugin -D
+```
+
+使用：
+
+- extractComments：是否将注释抽取到一个单独文件(生产环境不需要) 默认是 true
+
+  默认为 true，会生成一份注释文件
+
+  ![](/imgs/img31.png)
+
+  一般不需要，设置为 false
+
+- parallel：使用多进程并发运行提高构建的速度，默认值是true
+
+- cache：开启缓存
+
+- sourceMap：启动 source-map, 启动 source-map, 如果生产生产环境要 source-map，必须设置为 true，不然内联的 source-map 可能会被压缩掉
+
+- terserOptions：更多细致化的配置，例如去除 console.log 等，可以查看 https://webpack.docschina.org/plugins/terser-webpack-plugin/#terseroptions
+
+```js
+module.exports = {
+    optimization： {
+        // minimize: true, // 开启或者关闭 minimizer，生产环境默认开启
+        minimizer: [
+            new TerserWebpackPlugin({
+                cache: true, // 开启缓存
+                parallel: true, // 开启多进程打包
+                extractComments: false,
+                // sourceMap: true,
+
+                // 去除 console.log 
+                // terserOptions: {
+                //   compress: {
+                //     drop_console: true,
+                //   },
+                // },
+            }),
+        ]
+    }
+}
+```
 
 #### 14、html 压缩
 
--   使用 html-webpack-plugin
+使用 html-webpack-plugin
+
+安装：
+
+```js
+npm i html-webpack-plugin -D
+```
+
+使用：
 
 ```
 plugins: [

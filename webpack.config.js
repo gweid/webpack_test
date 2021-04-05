@@ -3,12 +3,13 @@ const { DefinePlugin } = require('webpack') // 设置全局变量
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 抽离 css, 将 css 从 js 中抽离出来，减少 js 体积，有利于减少页面加载时间
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin') // 压缩 css
+const CssMinimizerWebpackPlugin = require("css-minimizer-webpack-plugin")
 const webpack = require('webpack')
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin') // pwa
 const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin') // 动态使用 cdn
 const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 // const AutodllWebpackPlugin = require('autodll-webpack-plugin')
-const TerserWebpackPlugin = require('terser-webpack-plugin')
+const TerserWebpackPlugin = require('terser-webpack-plugin') // 压缩 js
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
 // 对打包进行计时
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
@@ -244,7 +245,7 @@ const webpackConfig = (env, options) => {
         filename: 'css/[name].[contenthash:8].css', // 分离到到 main.css  使用 contenthash 值
       }),
       // 压缩 css
-      new OptimizeCssAssetsWebpackPlugin(),
+      // new OptimizeCssAssetsWebpackPlugin(),
 
       // pwa
       new WorkboxWebpackPlugin.GenerateSW({
@@ -309,20 +310,28 @@ const webpackConfig = (env, options) => {
         name: entrypoint => `runtime_${entrypoint.name}`
       },
 
+      // 开启或者关闭 minimizer，生产环境默认开启
+      // minimize: true,
+
       // 配置生产环境的压缩方案
       minimizer: [
-        new TerserWebpackPlugin({
-          cache: true, // 开启缓存
-          parallel: true, // 开启多进程打包
-          // sourceMap: true, // 启动 source-map, 如果生产生产环境要 source-map，打开，不然内联的 source-map 可能会被压缩掉
+        // 压缩 css
+        new CssMinimizerWebpackPlugin(),
 
-          // 去除 console.log 
-          // terserOptions: {
-          //   compress: {
-          //     drop_console: true,
-          //   },
-          // },
-        }),
+        // 压缩 js，webpack4 以后，生产环境直接使用默认的即可
+        // new TerserWebpackPlugin({
+        //   cache: true, // 开启缓存
+        //   parallel: true, // 开启多进程打包
+        //   extractComments: false, // 是否将注释抽取到一个单独文件(生产环境不需要) 默认是 true
+        //   // sourceMap: true, // 启动 source-map, 如果生产生产环境要 source-map，打开，不然内联的 source-map 可能会被压缩掉
+
+        //   // 去除 console.log 
+        //   // terserOptions: {
+        //   //   compress: {
+        //   //     drop_console: true,
+        //   //   },
+        //   // },
+        // }),
       ],
     },
   }
