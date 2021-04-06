@@ -2806,6 +2806,24 @@ process.env.NODE_ENV
 
 #### 4、分析打包大小
 
+**使用官方提供的：**
+
+在 package.json 中
+
+```js
+"scripts": {
+    "stats": "webpack --mode production --profile --json > stats.json"
+},
+```
+
+执行会生成一个 stats.json 文件
+
+然后打开 http://webpack.github.com/analyse，将 stats.json 文件上传，就能看到
+
+![](/imgs/img36.png)
+
+
+
 **使用 webpack-bundle-analyzer**
 
 安装：

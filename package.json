@@ -9,7 +9,8 @@
         "serve": "webpack-dev-server --mode development --progress",
         "build": "webpack --mode production --progress",
         "dll": "webpack --config webpack.dll.config.js --mode production --progress",
-        "analyz": "cross-env NODE_ENV=analyzer webpack"
+        "analyz": "cross-env NODE_ENV=analyzer webpack",
+        "stats": "webpack --mode production --profile --json > stats.json"
     },
     "author": "",
     "license": "ISC",
