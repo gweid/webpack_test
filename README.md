@@ -1469,7 +1469,15 @@ module.exports = {
 },
 ```
 
-**12-5、认识 polyfill**
+**12-5、babel 的 plugins 和 preset 的区别**
+
+Babel 插件一般尽可能拆成小的力度，开发者可以按需引进。比如对 ES6 转 ES5 的功能，Babel 官方拆成了20+个插件。
+
+但很多时候，逐个插件引入的效率比较低下。比如在项目开发中，开发者想要将所有ES6的代码转成ES5，插件逐个引入的方式令人抓狂，不单费力，而且容易出错。
+
+这个时候，可以采用Babel Preset。可以简单地理解：Babel Preset 是 Babel Plugin 的集合
+
+**12-6、认识 polyfill**
 
 主要的意思就是垫片、补丁
 
