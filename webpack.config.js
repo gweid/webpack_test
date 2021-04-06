@@ -14,7 +14,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先�
 // 对打包进行计时
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 // const smp = new SpeedMeasurePlugin()
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin // 分析打包大小
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer') // 分析打包大小
 const CopyWebpackPlugin = require('copy-webpack-plugin') // 复制目录
 
 // css 公共配置
@@ -205,8 +205,6 @@ const webpackConfig = (env, options) => {
       // 打包构建前先清空 dist
       new CleanWebpackPlugin(),
 
-      ...useAnalyz(),
-
       // new webpack.HotModuleReplacementPlugin(),
 
       new HtmlWebpackPlugin({
@@ -280,6 +278,8 @@ const webpackConfig = (env, options) => {
       new AddAssetHtmlWebpackPlugin({
         filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
       }),
+
+      ...useAnalyz(),
     ],
 
     optimization: {

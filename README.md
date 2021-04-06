@@ -2963,6 +2963,38 @@ module.exports = CoptyWebpackPlugin
 
 
 
+# webpack 的启动流程
+
+### 1、从 npm run build 开始
+
+首先，npm run build 是执行的 `"build": "webpack --mode production --progress" 这一行代码，相当于执行 npx webpack
+
+npx webpack 主要就是去到 node_modules 下面的 .bin 目录找到 webpack 文件，然后执行
+
+### 2、node_modules/.bin/webpack
+
+```js
+#!/bin/sh
+# ...
+
+if [ -x "$basedir/node" ]; then
+  "$basedir/node"  "$basedir/../webpack/bin/webpack.js" "$@"
+  ret=$?
+else 
+  node  "$basedir/../webpack/bin/webpack.js" "$@"
+  ret=$?
+fi
+exit $ret
+```
+
+可以看出，就是通过 shell 命令去执行 node_modules/webpack/bin/webpack.js 文件
+
+### 3、node_modules/webpack/bin/webpack.js 文件
+
+
+
+
+
 # webpack 打包原理
 
 ### 流程
