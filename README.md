@@ -1469,15 +1469,7 @@ module.exports = {
 },
 ```
 
-**12-5、babel 的 plugins 和 preset 的区别**
-
-Babel 插件一般尽可能拆成小的力度，开发者可以按需引进。比如对 ES6 转 ES5 的功能，Babel 官方拆成了20+个插件。
-
-但很多时候，逐个插件引入的效率比较低下。比如在项目开发中，开发者想要将所有ES6的代码转成ES5，插件逐个引入的方式令人抓狂，不单费力，而且容易出错。
-
-这个时候，可以采用Babel Preset。可以简单地理解：Babel Preset 是 Babel Plugin 的集合
-
-**12-6、认识 polyfill**
+**12-5、认识 polyfill**
 
 主要的意思就是垫片、补丁
 
@@ -2763,6 +2755,8 @@ package.json 启动命令行加 --progress
 
 #### 2、分析打包各个模块使用时间
 
+如果希望看到每一个 loader、plugins 消耗的打包时间，可以利用插件：speed-measure-webpack-plugin
+
 安装：
 
 ```js
@@ -2783,6 +2777,8 @@ const webpackConfig = (env, options) => {
 
 module.exports = smp.wrap(webpackConfig)
 ```
+
+![](/imgs/img34.png)
 
 #### 3、配置不同环境
 
@@ -2810,6 +2806,8 @@ process.env.NODE_ENV
 
 #### 4、分析打包大小
 
+**使用 webpack-bundle-analyzer**
+
 安装：
 
 ```js
@@ -2825,6 +2823,10 @@ plugins: [
     new BundleAnalyzerPlugin()
 ]
 ```
+
+会自动在浏览器127.0.0.1:8888 上打开这个页面
+
+![](/imgs/img35.png)
 
 
 
