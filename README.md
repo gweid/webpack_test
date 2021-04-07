@@ -2967,6 +2967,8 @@ module.exports = CoptyWebpackPlugin
 
 基于 webpack5.24.4 和 webpack-cli4.5.0 分析启动流程
 
+![](/imgs/img37.png)
+
 ### 1、从 npm run build 开始
 
 首先，npm run build 是执行的 `"build": "webpack --mode production --progress" 这一行代码，相当于执行 npx webpack
@@ -3152,24 +3154,193 @@ const runCLI = async (args, originalModuleCompile) => {
 };
 ```
 
-### 6、webpack cli 的 run
+### 6、new WebpackCLI()
 
-执行 run 方法，里面会进行包检测和参数处理：
+```js
+class WebpackCLI {
+    constructor() {
+        this.webpack = require('webpack');
+        //...
+    }
+    
+    async createCompiler(options, callback) {
+        //...
+        try {
+            compiler = this.webpack(
+                config.options,
+                callback
+                    ? (error, stats) => {
+                          if (error && this.isValidationError(error)) {
+                              this.logger.error(error.message);
+                              process.exit(2);
+                          }
 
-- 通过 makeCommand 函数检测一些包有没有安装
-- 在 makeCommand 函数里面通过执行 makeOption 对参数进一步处理
+                          callback(error, stats);
+                      }
+                    : callback,
+            );
+        } catch (error) {
+
+        }
+
+        return compiler;
+    }
+}
+```
+
+new WebpackCLI() 最主要的作用就是引入了 webpack。webpack 本质上就是一个函数，它接受两个参数，一个是 config 配置，一个是回掉函数。config 配置就是我们常常配置的 webpack.config.js 还有 package.json 里面的比如 --watch 这些
 
 
 
+### 7、webpack cli 的 run
+
+执行 run 方法：
+
+```js
+class WebpackCLI {
+    constructor() {
+        this.webpack = require('webpack');
+        //...
+    }
+    
+    async run(args, parseOptions) {
+        const loadCommandByName = async (commandName, allowToInstall = false) => {
+            // ...
+            if (isBuildCommandUsed || isWatchCommandUsed) {
+                const options = this.getBuiltInOptions();
+				// 执行 makeCommand
+                await this.makeCommand(
+                    isBuildCommandUsed ? buildCommandOptions : watchCommandOptions,
+                    isWatchCommandUsed ? options.filter((option) => option.name !== 'watch') : options,
+                    async (entries, options) => {
+                        if (entries.length > 0) {
+                            options.entry = [...entries, ...(options.entry || [])];
+                        }
+						// 执行 buildCommand
+                        await this.buildCommand(options, isWatchCommandUsed);
+                    },
+                );
+            }
+        }
+    }
+}
+```
+
+1. 通过 makeCommand 函数检测一些包有没有安装
+
+2. 在 makeCommand 函数里面通过执行 makeOption 对配置参数进一步处理
+
+   ```js
+   class WebpackCLI {
+       async makeCommand(commandOptions, options, action) {
+           //...
+           if (options) {
+               // ....
+               options.forEach((optionForCommand) => {
+                   // 执行 makeOption 对配置参数进行处理
+                   this.makeOption(command, optionForCommand);
+               });
+           }
+       }
+   
+       makeOption(command, option) {
+           //....
+       }
+   }
+   ```
+
+3. 执行 buildCommand，这个函数主要就是执行 createCompiler 拿到 webpack 的 compiler
+
+   ```js
+   class WebpackCLI {
+       constructor() {
+           this.webpack = require('webpack');
+           //...
+       }
+       
+       async run(args, parseOptions) {
+           const loadCommandByName = async (commandName, allowToInstall = false) => {
+               // 执行 makeCommand
+               await this.makeCommand(
+                       // 执行 buildCommand
+                       await this.buildCommand(options, isWatchCommandUsed);
+                   },
+               );
+       }
+       
+       async buildCommand(options, isWatchCommand) {
+           // ...
+           compiler = await this.createCompiler(options, callback);
+       }
+   }
+   ```
+
+4. createCompiler 这个函数主要就是调用了 this.webpack 拿到 webpack 函数执行，返回 webpack 的 compiler
+
+   ```js
+   async createCompiler(options, callback) {
+       // ...
+       compiler = this.webpack(
+           config.options,
+           callback
+           ? (error, stats) => {
+               if (error && this.isValidationError(error)) {
+                   this.logger.error(error.message);
+                   process.exit(2);
+               }
+   
+               callback(error, stats);
+           }
+           : callback,
+       );
+       
+       return compiler
+   }
+   ```
 
 
 
+### 8、结论
 
+在 webpack 中，启动 webpack 借助于 webpack-cli，webpack-cli 主要做的事就是：对 webpack.config.js 以及 package.json 中于与 webpack 相关的配置参数做处理、合并等等一些前置操作，其实最核心的就是下面这一段，执行 wbepack 函数
 
+```js
+compiler = this.webpack(
+    config.options,
+    callback
+    ? (error, stats) => {
+        if (error && this.isValidationError(error)) {
+            this.logger.error(error.message);
+            process.exit(2);
+        }
 
+        callback(error, stats);
+    }
+    : callback,
+);
+```
 
+其实在 vue-cli 或者 create-react-app 里面就根本没有使用到 webpack-cli，就是因为 webpack-cli 那边主要就是做的一些配置前置处理，而这些脚手架工具不需要。
 
+验证：在 webpack 中不使用 webpack-cli 也能进行打包
 
+新建一个 build.js 文件：
+
+```js
+const webpack = require('webpack')
+
+const configFun = require('./webpack.config')
+
+const webpackConfig = configFun(null, { mode: 'production' })
+
+const compiler = webpack(webpackConfig, (err, res) => {
+  if (err) {
+    console.log(err)
+  }
+})
+```
+
+然后执行 `node build.js`，可以发现，依然可以生成打包后的文件
 
 
 
