@@ -2965,6 +2965,8 @@ module.exports = CoptyWebpackPlugin
 
 # webpack 的启动流程
 
+基于 webpack5.24.4 和 webpack-cli4.5.0 分析启动流程
+
 ### 1、从 npm run build 开始
 
 首先，npm run build 是执行的 `"build": "webpack --mode production --progress" 这一行代码，相当于执行 npx webpack
@@ -2990,6 +2992,182 @@ exit $ret
 可以看出，就是通过 shell 命令去执行 node_modules/webpack/bin/webpack.js 文件
 
 ### 3、node_modules/webpack/bin/webpack.js 文件
+
+```js
+// 对包进行安装的函数
+const runCommand = (command, args) => {
+	const cp = require("child_process");
+	return new Promise((resolve, reject) => {
+		const executedCommand = cp.spawn(command, args, {
+			stdio: "inherit",
+			shell: true
+		});
+	});
+};
+
+// 用于检测 webpack-cli 有没有安装
+const isInstalled = packageName => {
+	try {
+		require.resolve(packageName);
+		return true;
+	} catch (err) {
+		return false;
+	}
+};
+
+/**
+ * 主要做的：
+ *   1、拼接到路径：pkgPath = webpack-cli/package.json
+ *   2、引入 webpack-cli/package.json
+ *   3、拼接路径 path.resolve(path.dirname(pkgPath), pkg.bin[cli.binName]) = webpack-cli/bin/cli.js
+ *   4、执行 webpack-cli/bin/cli.js
+ */
+const runCli = cli => {
+	const path = require("path");
+	const pkgPath = require.resolve(`${cli.package}/package.json`);
+	// eslint-disable-next-line node/no-missing-require
+	const pkg = require(pkgPath);
+	// eslint-disable-next-line node/no-missing-require
+	require(path.resolve(path.dirname(pkgPath), pkg.bin[cli.binName]));
+};
+
+const cli = {
+	name: "webpack-cli",
+	package: "webpack-cli",
+	binName: "webpack-cli",
+	installed: isInstalled("webpack-cli"), // 检测有没有安装 webpack-cli
+	url: "https://github.com/webpack/webpack-cli"
+};
+
+/**
+ * 主要的逻辑：
+ * 如果安装了 webpack-cli，那么直接执行 runCli
+ * 如果没有安装 webpack-cli
+ *     1、报警告，没有安装 webpack-cli
+ *     2、检测使用的是 npm 还是 pnpm 还是 yarn
+ *     3、提问题：是否需要安装 webpack-cli
+ *     4、安装成功后执行 runCli
+ */
+if (!cli.installed) {
+    // ...
+	const notify =
+		"CLI for webpack must be installed.\n" + `  ${cli.name} (${cli.url})\n`;
+
+	console.error(notify);
+
+	let packageManager;
+
+	if (fs.existsSync(path.resolve(process.cwd(), "yarn.lock"))) {
+		packageManager = "yarn";
+	} else if (fs.existsSync(path.resolve(process.cwd(), "pnpm-lock.yaml"))) {
+		packageManager = "pnpm";
+	} else {
+		packageManager = "npm";
+	}
+
+	const installOptions = [packageManager === "yarn" ? "add" : "install", "-D"];
+
+	const question = `Do you want to install 'webpack-cli' (yes/no): `;
+
+	const questionInterface = readLine.createInterface({
+		input: process.stdin,
+		output: process.stderr
+	});
+
+	process.exitCode = 1;
+	questionInterface.question(question, answer => {
+		// ...
+		// 调用 runCommand 安装 webpack-cli, 安装完 webpack-cli 后执行 runCli
+		runCommand(packageManager, installOptions.concat(cli.package))
+			.then(() => {
+				runCli(cli);
+			})
+			.catch(error => {
+				console.error(error);
+				process.exitCode = 1;
+			});
+	});
+} else {
+	runCli(cli);
+}
+```
+
+这个一步最终就是**通过 runCli 函数去加载 node_modules/webpack-cli/bin/cli.js，然后执行 cli.js 文件**
+
+> 我们在使用 webpack 通过 npm 下载包的时候，一般是会 webpack 跟 webpack-cli 一起下载的，所以基本就是直接走到了 runCli(cli) 这一步
+
+### 4、node_modules/webpack-cli/bin/cli.js
+
+这个的逻辑其实也很简单，就是如果没有下载 webpack，就发出警告，并且通过提问的方式询问是否需要下载 webpack。
+
+如果安装了 webpack，那么执行 runCLI
+
+```js
+const runCLI = require('../lib/bootstrap');
+const utils = require('../lib/utils');
+
+// 判断有没有下载 webpack 这个包（我们在 npm 下载的时候，一般都是会将 webpack 和 webpack-cli 一同下载的）
+if (utils.packageExists('webpack')) {
+    runCLI(process.argv, originalModuleCompile);
+} else {
+    const { promptInstallation, logger, colors } = utils;
+
+    promptInstallation('webpack', () => {
+        utils.logger.error(`It looks like ${colors.bold('webpack')} is not installed.`);
+    })
+        .then(() => {
+            logger.success(`${colors.bold('webpack')} was installed successfully.`);
+
+            runCLI(process.argv, originalModuleCompile);
+        })
+        .catch(() => {
+            logger.error(`Action Interrupted, Please try once again or install ${colors.bold('webpack')} manually.`);
+
+            process.exit(2);
+        });
+}
+```
+
+- promptInstallation 里面会通过提问引导用户下载 webpack
+
+这一步的最终结果就是执行 runCLI，这个函数由 webpack-cli/lib/bootstrap.js 得到
+
+### 5、runCLI 函数
+
+runCLI 函数由 webpack-cli/lib/bootstrap.js 得到，主要作用：就是创建一个 WebpackCLI 类实例，然后执行这个实例里面的 run 方法
+
+```js
+const WebpackCLI = require('./webpack-cli');
+
+const runCLI = async (args, originalModuleCompile) => {
+    try {
+        const cli = new WebpackCLI();
+
+        cli._originalModuleCompile = originalModuleCompile;
+
+        await cli.run(args);
+    } catch (error) {
+        //...
+    }
+};
+```
+
+### 6、webpack cli 的 run
+
+执行 run 方法，里面会进行包检测和参数处理：
+
+- 通过 makeCommand 函数检测一些包有没有安装
+- 在 makeCommand 函数里面通过执行 makeOption 对参数进一步处理
+
+
+
+
+
+
+
+
+
+
 
 
 
