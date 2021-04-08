@@ -3344,6 +3344,12 @@ const compiler = webpack(webpackConfig, (err, res) => {
 
 
 
+# webpack 源码阅读
+
+https://github.com/gweid/webpack-source-code
+
+
+
 # webpack 打包原理
 
 ### 流程
