@@ -2906,6 +2906,89 @@ globalObject: 'this' 这里的 this 设置的就是上面图片中自执行函�
 
 #### a、写一个 loader
 
+loader 本质上是一个到处为函数的 javascript  模块，在编译过程中，loader-runner 这个库会调用这个 loader 函数，然后将上一个 loader 产生的结果或者资源文件传进去
+
+
+
+```js
+module.exports = function(content, sourcemap, meta) {
+  return content
+}
+```
+
+导出的函数接收三个参数：
+
+- content：资源文件的内容（webpack通过 fs.readFile 读到的文件内容）
+- sourcemap：sourcemap 相关的数据
+- meta：一些元数据
+
+一般来讲，**很少用到 sourcemap 以及 meta 这两个参数**
+
+最后，必须把 content 或者处理过的文件内容返回去
+
+
+
+**引用 loader 的几种方式：**
+
+自定义在 myLoader/myLoader.js 的 loader 怎么去引用
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: 'myLoader'
+      }
+    ]
+  }
+}
+```
+
+像正常那样，直接写 loader 名字是不行的，因为 webapck 中直接写 loader 名字默认会去 node_modules 中查找
+
+- 第一种，直接自定义 loader 的路径，这种方法依赖于 context（这种写起来过于繁琐）
+
+  ```js
+  const path = require
+  
+  module.exports = {
+    context: 
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: 'myLoader'
+        }
+      ]
+    }
+  }
+  ```
+
+- 使用 resolveLoader 配置读取 loader 的默认路径
+
+  ```js
+  module.exports = {
+    resolveLoader: {
+      modules: ['node_modules', './myLoader']
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: 'myLoader'
+        }
+      ]
+    }
+  }
+  ```
+
+**loader 的执行顺序：**
+
+自下向上，从右往左。
+
+
+
 ```
 myLoader.js
 

@@ -10,6 +10,8 @@ test/vue-test/node_modules
 test/vue-test/dist
 test/libraryTest/node_modules
 test/libraryTest/dist
+test/createLoader/node_modules
+test/createLoader/dist
 
 # Log files
 npm-debug.log*
