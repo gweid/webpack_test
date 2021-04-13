@@ -2906,9 +2906,17 @@ globalObject: 'this' 这里的 this 设置的就是上面图片中自执行函�
 
 #### a、写一个 loader
 
+**loader 的基本认知**
+
+Loader是一个具有单一职责的转换器
+
+- 转换器：在 webpack 中一切皆 js 模块，而 loader 的作用就是把非 js 模块转化为 js 模块，供 webpack 进行打包处理
+  - 非js模块即样式文件（.css、.less、.scss等），非标准JS文件（.ts、.jsx、.vue），以及其他类型的文件（svg、png | jpg | jpeg等）
+- 单一职责：一个 loader 只负责一种转换。单一职责是 webpack 社区对 loader 定义的约束。如果一个源文件需要经历多步转换才能被使用，就应该通过多个 loader 去转换
+
+
+
 loader 本质上是一个到处为函数的 javascript  模块，在编译过程中，loader-runner 这个库会调用这个 loader 函数，然后将上一个 loader 产生的结果或者资源文件传进去
-
-
 
 ```js
 module.exports = function(content, sourcemap, meta) {
@@ -2919,12 +2927,12 @@ module.exports = function(content, sourcemap, meta) {
 导出的函数接收三个参数：
 
 - content：资源文件的内容（webpack通过 fs.readFile 读到的文件内容）
-- sourcemap：sourcemap 相关的数据
-- meta：一些元数据
+- sourcemap：前面 loader 生成的 source map，可以传递给后方 loader 共享
+- meta：其他需要传给后方 loader 共享的信息，可自定义
 
 一般来讲，**很少用到 sourcemap 以及 meta 这两个参数**
 
-最后，必须把 content 或者处理过的文件内容返回去
+最后，必须把 content 或者处理过的文件内容返回去，类型为 string 或者 buffer
 
 
 
@@ -2985,9 +2993,301 @@ module.exports = {
 
 **loader 的执行顺序：**
 
-自下向上，从右往左。
+一般情况下，loader 的执行顺序是自下向上，从右往左。为什么呢？
+
+loader 执行包括两个阶段，pitch 阶段和 normal 阶段。Normal阶段，就是一般认为的 loader 对源文件进行转译的阶段。
+
+例如：有 loader1.js
+
+```js
+// Normal 阶段
+module.exports = function(content, sourcemap, meta) {
+  console.log('Normal 1')
+  return content
+}
+
+// Pitch 阶段
+module.exports.pitch = function() {
+  console.log("Pitch 1");
+}
+```
+
+有 loader2.js
+
+```js
+// Normal 阶段
+module.exports = function(content, sourcemap, meta) {
+  console.log('Normal 2')
+  return content
+}
+
+// Pitch 阶段
+module.exports.pitch = function() {
+  console.log("Pitch 2");
+}
+```
+
+使用：
+
+```js
+module.exports = {
+  resolveLoader: {
+    modules: ['node_modules', './myLoader']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: ['loader1', 'loader2']
+      }
+    ]
+  }
+}
+```
+
+那么控制台会输出：
+
+![](/imgs/img38.png)
+
+为什么会这样呢？首先，在 webpack 中，loader 会交给 runLoaders 这个函数处理，而这个函数来自于 loader-runner 这个第三方包，来看看 runLoaders 的处理逻辑：
+
+```js
+exports.runLoaders = function runLoaders(options, callback) {
+    // ...
+    
+    // 执行 iteratePitchingLoaders 方法迭代 PitchingLoaders
+    iteratePitchingLoaders(processOptions, loaderContext, function(err, result) {
+		if(err) {
+			return callback(err, {...});
+		}
+		callback(null, {...});
+	});
+}
+
+function iteratePitchingLoaders(options, loaderContext, callback) {
+	// iterate
+	if(currentLoaderObject.pitchExecuted) {
+		loaderContext.loaderIndex++;
+		return iteratePitchingLoaders(options, loaderContext, callback);
+	}
+
+	// load loader module
+	loadLoader(currentLoaderObject, function(err) {
+		// ...
+        
+        currentLoaderObject.pitchExecuted = true;
+
+		runSyncOrAsync(
+			fn,
+			loaderContext, [loaderContext.remainingRequest, loaderContext.previousRequest, currentLoaderObject.data = {}],
+			function(err) {
+                // ...
+                loaderContext.loaderIndex--;
+                iterateNormalLoaders(options, loaderContext, args, callback);
+			}
+		);
+	});
+}
+```
+
+可以看到，runLoaders 最后实际上就是调用 iteratePitchingLoaders 这个函数，这个函数主要就是迭代 loader，找到 pitch 阶段执行，但是还做了一件事，就是通过 loaderContext.loaderIndex++。最后，再迭代 loader 执行 normal 阶段是利用 loaderContext.loaderIndex--。所以这就是 pitch 是顺序执行，normal 是逆序执行，而 loader 对源文件进行转译的阶段是 normal 阶段，所以才有自右向左，从下往上的执行顺序。
+
+![](/imgs/img39.png)
 
 
+
+**修改loader执行顺序：**
+
+首先，目前 loader 有四类：
+
+- 前置（Pre）
+- 普通（Normal）
+- 后置（Post）
+- 行内（Inline）
+
+首先是 Normal loader，这个就是平时常见的 loader
+
+
+
+然后是前置跟后置 loader，这个可以通过 enforce 设置：
+
+```js
+module.exports = {
+  resolveLoader: {
+    modules: ['node_modules', './myLoader']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: 'myLoader',
+        enforce: 'pre'
+      },
+      {
+        test: /\.js$/,
+        use: 'normalLoader'
+      },
+      {
+        test: /\.js$/,
+        use: 'testLoader',
+        enforce: 'post'
+      }
+    ]
+  }
+}
+```
+
+那么执行顺序是就不会从下往上，而是 myLoader --> normalLoader --> testLoader
+
+
+
+接着是行内 loader，在 webpack 中，还可以这样子写 loader
+
+```js
+import 'loader1!loader2!./test.js'
+```
+
+> 官方一般是不推荐使用行内 loader 的
+
+所以，基于以上，loader 的实行顺序：pre loader > inline loader > normal loader > post loader
+
+
+
+**同步与异步 loader**
+
+首先，必须要明确的是，loader 函数必须要返回值，不然会报错。而且是在 loader 函数执行完之后就要返回值，那么就会存在问题，比如 loader 里面有异步的操作，那么异步操作会进入到异步队列，把返回放在异步操作里面，就不符合 loader 函数执行完之后就要返回值的设定，一样会报错。所以就有了异步 loader 的概念。
+
+先看同步 loader，同步 loader 返回有两种方式：
+
+- 直接 return content
+- 使用 this.callback，这个一般是需要返回错误的时候
+  - 参数1：错误信息，没有就 null
+  - 参数2：content
+  - 参数3：sourcemap
+  - 参数4：meta
+
+```js
+module.exports = function(content, sourcemap, meta) {
+  // return content
+
+  console.log('syncOrAsyncLoader')
+  this.callback(null, content, sourcemap, meta)
+}
+```
+
+> 这里的 this 就是 loader 实例
+
+接着是异步 loader，很简单，只要调用 this.async() 返回 callback 即可
+
+```js
+module.exports = function(content, sourcemap, meta) {
+  //------------------------ 异步 loader
+  console.log('开始了')
+
+  const callback = this.async()
+
+  setTimeout(() =>{
+    console.log('异步 loader')
+    callback(null, content)
+  }, 2000)
+}
+```
+
+
+
+**获取 loader 参数以及参数校验**
+
+1. 获取参数：webpack 提供了 loader-utils 解析库来获取 loader 传进来的参数
+
+   安装：
+
+   ```js
+   npm i loader-utils -D
+   ```
+
+   使用：首先在使用 loader 的时候传入参数：
+
+   ```js
+   module.exports = {
+     resolveLoader: {
+       modules: ['node_modules', './myLoader']
+     },
+     module: {
+       rules: [
+         {
+           test: /\.js$/,
+           use: [
+             {
+               loader: 'optionLoader',
+               options: {
+                 name: 'optionLoader',
+                 needLog: true
+               }
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+   获取参数：
+
+   ```js
+   const { getOptions } = require('loader-utils') 
+   
+   module.exports = function (content) {
+     const options = getOptions(this)
+     console.log(options) // { name: 'optionLoader', needLog: true }
+   
+     return content
+   }
+   ```
+
+2. 可以通过 webpack 提供的 schema-utils 进行参数校验
+
+   安装：
+
+   ```js
+   npm i schema-utils -D
+   ```
+
+   使用：
+
+   ```js
+   const { getOptions } = require('loader-utils')
+   const { validate } = require('schema-utils');
+   
+   const schema = {
+     "type": "object",
+     "properties": {
+       "name": {
+         "type": "string",
+         "description": "请输入name"
+       },
+       "needLog": {
+         "type": "boolean",
+         "description": "请输入needLog"
+       }
+     }
+   }
+   
+   module.exports = function (content) {
+     // 获取参数
+     const options = getOptions(this)
+   
+     // 参数检验
+     validate(schema, options, 'optionLoader')
+   
+     return content
+   }
+   ```
+
+
+
+
+
+**手动实现一个 loader：**
 
 ```
 myLoader.js
