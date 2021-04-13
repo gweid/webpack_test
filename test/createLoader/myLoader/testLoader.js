@@ -1,10 +1,15 @@
-// NormalLoader
-module.exports = function(content, sourcemap, meta) {
-  console.log('NormalLoader 2')
-  return content
-}
+// Normal
+// module.exports = function(content, sourcemap, meta) {
+//   console.log('Normal 2')
+//   return content
+// }
 
-// PitchLoader
-module.exports.pitch = function() {
-  console.log("PitchLoader 2");
+// Pitch
+// module.exports.pitch = function() {
+//   console.log("Pitch 2");
+// }
+
+module.exports = function(content) {
+  console.log('testLoader')
+  return content
 }

@@ -15,9 +15,45 @@ module.exports = {
   },
   module: {
     rules: [
+      // {
+      //   test: /\.js$/,
+      //   use: ['myLoader', 'testLoader']
+      // }
+
+      // loader 执行顺序
+      // {
+      //   test: /\.js$/,
+      //   use: 'myLoader',
+      //   enforce: 'pre'
+      // },
+      // {
+      //   test: /\.js$/,
+      //   use: 'normalLoader'
+      // },
+      // {
+      //   test: /\.js$/,
+      //   use: 'testLoader',
+      //   enforce: 'post'
+      // }
+
+      // 同步/异步 loader
+      // {
+      //   test: /\.js$/,
+      //   use: 'syncOrAsyncLoader'
+      // }
+
+      // 使用 loader 时传入参数
       {
         test: /\.js$/,
-        use: ['myLoader', 'testLoader']
+        use: [
+          {
+            loader: 'optionLoader',
+            options: {
+              // name: 'optionLoader',
+              needLog: true
+            }
+          }
+        ]
       }
     ]
   },
