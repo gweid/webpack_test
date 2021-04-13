@@ -3285,42 +3285,64 @@ module.exports = function(content, sourcemap, meta) {
 
 
 
+**手动实现 loader：**
 
+实例1：不使用 babel-loader，实现自己的 babel-loader
 
-**手动实现一个 loader：**
+myBabelLoader.js
 
-```
-myLoader.js
+```js
+const { transform } = require('@babel/core')
+const { getOptions } = require('loader-utils')
 
-module.exports = function (source) {
-    // source 传进来的代码
+module.exports = function(content) {
+  const callback = this.async()
 
-    /**
-     * this 有几个常用的
-     * this.query  通过 options 传过来的参数
-     * this.callback  可以代替 return 返回
-     *
-     * this.callback(
-     *    err: Error | null,
-     *    content: string | Buffer,
-     *    sourceMap?: SourceMap,
-     *    meta?: any
-     * );
-     *   第一个参数必须是 Error 或者 null
-     *   第二个参数是一个 string 或者 Buffer。
-     *   可选的：第三个参数必须是一个可以被这个模块解析的 source map。
-     *   可选的：第四个选项，会被 webpack 忽略，可以是任何东西（例如一些元数据）。
-     *
-     *
-     */
+  const options = getOptions(this)
 
-    const options = loaderUtils.getOptions(this)
-    const reset = source.replace("", options.xx)
-    this.callback(null, reset)
+  transform(content, options, (err, res) => {
+    // 在回调里面返回，必须使用异步 loader
+    if(err) {
+      callback(err)
+    } else {
+      callback(null, res.code)
+    }
+  })
 }
-
-// 使用就像正常 loader 一样使用
 ```
+
+使用：
+
+```js
+module.exports = {
+  resolveLoader: {
+    modules: ['node_modules', './myLoader']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: [
+          {
+            loader: 'optionLoader',
+            options: {
+              presets: [
+                '@babel/preset-env'
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+
+
+
+
+
 
 #### b、编写一个 plugin
 
