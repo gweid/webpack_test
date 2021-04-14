@@ -12,6 +12,8 @@ test/libraryTest/node_modules
 test/libraryTest/dist
 test/createLoader/node_modules
 test/createLoader/dist
+test/createPlugin/node_modules
+test/createPlugin/dist
 
 # Log files
 npm-debug.log*

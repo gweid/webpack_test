@@ -3430,31 +3430,47 @@ module.exports = function(content) {
 
 
 
+实例3：[自定义 loader 读取 *.vue 文件源码](https://juejin.cn/post/6904686261080948750)
+
 
 
 #### b、编写一个 plugin
 
-```
-class CoptyWebpackPlugin {
-  constructor() {}
+了解什么是 tapable
 
-  apply(compiler) {
-    compiler.hooks.emit.tapAsync('CoptyWebpackPlugin', (compilation, cb) => {
-      compilation.assets['copty.js'] = {
-        source() {
-          return 'copty'
-        },
-        size() {
-          return 5
-        },
-      }
-      cb()
-    })
-  }
-}
+https://juejin.cn/post/6937829048332746788
 
-module.exports = CoptyWebpackPlugin
-```
+所有的 webpack 插件都是基于 tapable 事件流， tapable 的 hook 的 使用流程就分为三步：
+
+1. 创建一个 hook
+
+   ```js
+   const testHook = new AsyncSeriesHook(['arg1'])
+   ```
+
+   数组里面有几个就代表后面会传几个参数
+
+2. 注册回调事件
+
+   ```js
+   testHook.tapAsync('xxx', (arg) => {})
+   ```
+
+   接收参数 arg
+
+3. 触发注册过的回调事件
+
+   ```js
+   testHook.callAsync('hello', () => {})
+   ```
+
+   传入参数的值为 hello
+
+
+
+实例1：开发一个上传静态资源到服务器的插件。在打包好后，自动把 dist 目录上传到服务器
+
+
 
 
 
