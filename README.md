@@ -3149,7 +3149,7 @@ import 'loader1!loader2!./test.js'
 
 > 官方一般是不推荐使用行内 loader 的
 
-所以，基于以上，loader 的实行顺序：pre loader > inline loader > normal loader > post loader
+所以，基于以上，loader 的实行顺序：pre loader > normal loader > inline loader >  post loader
 
 
 
@@ -3339,6 +3339,94 @@ module.exports = {
 ```
 
 
+
+实例2：写一个 md 文件转 html 的 loader
+
+首先需要用到 html-webpack-plugin 去展示页面，然后是 marked 去转换 md 为 html，还有就是 highlight.js 代码高亮，这三个包要安装一下。
+
+然后是后面会使用 highlight.js 默认的样式文件，所以需要安装一下 style-loader、css-loader
+
+一份需要转换的 md 文件，webpack.md
+
+index.js
+
+```js
+import "highlight.js/styles/default.css"
+import './css/codeHighlight.css'
+
+import code from './doc/webpack.md'
+
+document.body.innerHTML = code
+```
+
+webpack.confg.js
+
+```js
+const path = require('path')
+const HtmlWebpackPlugun = require('html-webpack-plugin')
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  devtool: false,
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'bundle.js'
+  },
+  resolveLoader: {
+    modules: ['node_modules', './myLoader']
+  },
+  module: {
+    rules: [
+      // 实现一个 md 文件转译 loader
+      {
+        test: /\.md$/,
+        use: [
+          {
+            loader: 'mdCompileLoader',
+          }
+        ]
+      },
+      // 需要用到 highlight.js 的默认 css 样式使代码高亮
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugun()
+  ]
+}
+```
+
+mdCompileLoader.js
+
+```js
+const marked = require('marked')
+const hljs = require('highlight.js')
+
+module.exports = function(content) {
+
+  // 这样主要是利用 highlight 给标签设置上 class 类，后面就可以通过 class 类写 css
+  marked.setOptions({
+    highlight: (code, lang) => {
+      return hljs.highlight(lang, code).value;
+    }
+  })
+
+  // 使用 marked 将 md 代码转换为 html
+  const htmlContent = marked(content)
+
+  // 将 html 壮观为 模板字符串，因为 loader 必须返回 string 或者 buffer
+  const strContent = "`" + htmlContent + "`"
+
+  // 为了在 index.js 中可以通过 import code from './doc/webpack.md' 的形式引入
+  const resContent = `var code = ${strContent}; export default code;`
+
+  return resContent
+}
+```
 
 
 

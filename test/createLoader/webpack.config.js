@@ -79,6 +79,11 @@ module.exports = {
             loader: 'mdCompileLoader',
           }
         ]
+      },
+      // 需要用到 highlight.js 的默认 css 样式使代码高亮
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
