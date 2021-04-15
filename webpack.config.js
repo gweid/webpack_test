@@ -19,34 +19,26 @@ const CopyWebpackPlugin = require('copy-webpack-plugin') // 复制目录
 
 // css 公共配置
 function commentCss(mode, importLoaders = 1) {
-  let option = []
-
-  // 只在生产环境进行 css 抽离，便于在开发环境中使用 HMR
-  switch (mode) {
-    case 'development':
-      option.push('style-loader')
-      break
-
-    case 'production':
-      option.push({
-        loader: MiniCssExtractPlugin.loader, // 抽离 css
-        options: {
-          // 抽离 css 一定要在这里配置 publicPath，不然 CSS 里面的图片路径是以 CSS 目录为根目录的
-          publicPath: '../',
-          hot: true,
-        },
-      })
-      break
-  }
-
-  // 配合 autoprefixer 做自动添加前缀
-  option.push(...[
+  const isDev = mode === 'development'
+  const isProd = mode === 'production'
+  
+  const option = [
+    isDev && 'style-loader', // 开发环境使用 style-loader 插入
+    // 生产环境抽离 css
+    isProd && {
+      loader: MiniCssExtractPlugin.loader, // 抽离 css
+      options: {
+        // 抽离 css 一定要在这里配置 publicPath，不然 CSS 里面的图片路径是以 CSS 目录为根目录的
+        publicPath: '../',
+        hot: true,
+      }
+    },
     {
       loader: 'css-loader',
       options: { importLoaders }
     },
     'postcss-loader' // postcss 的配置在 postcss.config.js 文件
-  ])
+  ].filter(Boolean) // 通过 ['style-loader', false].filter(Boolean) 可以过滤掉 false/undefined 之类的选项
 
   return option
 }
