@@ -19,7 +19,10 @@ module.exports = {
 
     // 自定义的上传静态资源到服务器插件
     new UploadAssetPlugin({
-      
+      host: '',
+      username: '',
+      password: '',
+      remotePath: '/root/asset-test'
     })
   ]
 }

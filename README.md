@@ -3470,7 +3470,116 @@ https://juejin.cn/post/6937829048332746788
 
 实例1：开发一个上传静态资源到服务器的插件。在打包好后，自动把 dist 目录上传到服务器
 
+要上传文件到服务器，使用 node-ssh 这个包
 
+安装：
+
+```js
+npm i node-ssh -D
+```
+
+webpack.config.js
+
+```js
+const { resolve } = require('path')
+
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const UploadAssetPlugin = require('./plugins/uploadAssetPlugin')
+
+module.exports = {
+  mode: 'development',
+  devtool: false,
+  entry: './src/index.js',
+  output: {
+    path: resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin(),
+
+    // 自定义的上传静态资源到服务器插件
+    new UploadAssetPlugin({
+      host: '',
+      username: '',
+      password: '',
+      remotePath: '/root/asset-test'
+    })
+  ]
+}
+```
+
+uploadAssetPlugin.js：
+
+```js
+const { NodeSSH } = require('node-ssh')
+
+class UploadAssetPlugin {
+  constructor(options) {
+    this.options = options
+
+    this.ssh = new NodeSSH()
+  }
+
+  apply(compiler) {
+    compiler.hooks.afterEmit.tapAsync('upload-asset-plugin', async (compilation, callback) => {
+      console.log('准备上传资源到服务器...')
+
+      // 获取到打包后的资源输出目录
+      const outputPath = compilation.outputOptions.path
+
+      // 创建 ssh 连接
+      await this.connectSSH()
+
+      // 删除服务器中原来的资源
+      const serverDir = this.options.remotePath
+      await this.ssh.execCommand(`rm -rf ${serverDir}/*`)
+
+      // 通过 ssh 将打包后的资源上传到服务器
+      await this.uploadAsset(outputPath, this.options.remotePath)
+
+      // 关闭 ssh 连接
+      this.ssh.dispose()
+      
+      // 异步一般需要 callback 返回
+      callback()
+    })
+  }
+
+  async connectSSH() {
+    try {
+      await this.ssh.connect({
+        host: this.options.host, // 主机 host 地址
+        username: this.options.username, // 用户名
+        password: this.options.password // 密码
+      })
+
+      console.log('ssh 链接成功...')
+    } catch (error) {
+      console.log('ssh 连接失败！！！')
+    }
+  }
+
+  async uploadAsset(outputPath, remotePath) {
+    const status = await this.ssh.putDirectory(outputPath, remotePath, {
+      recursive: true,
+      concurrency: 10
+    })
+
+    console.log(`资源上传${status ? '成功' : '失败'}`)
+  }
+}
+
+module.exports = UploadAssetPlugin
+
+```
+
+
+
+更多自定义 webpack plugin 可以参考：
+
+https://juejin.cn/post/6844904162405138445
 
 
 
