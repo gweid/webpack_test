@@ -43,14 +43,6 @@ function commentCss(mode, importLoaders = 1) {
   return option
 }
 
-function useAnalyz () {
-  if (process.env.NODE_ENV === 'analyzer') {
-    return [new BundleAnalyzerPlugin()]
-  }
-  return []
-}
-
-
 const webpackConfig = (env, options) => {
   const MODE = options.mode // 获取 webpack4 的 mode 值
 
@@ -271,8 +263,10 @@ const webpackConfig = (env, options) => {
         filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
       }),
 
-      ...useAnalyz(),
-    ],
+      // 分析包大小
+      process.env.NODE_ENV === 'analyzer' && new BundleAnalyzerPlugin()
+
+    ].filter(Boolean),
 
     optimization: {
       // 代码分割
