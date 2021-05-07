@@ -8,16 +8,16 @@
 
 使用 webpack 目前需要安装 webpack、webpack-cli
 
-- 执行 webpack 命令会执行 node_modules 下的.bin目录下的webpack
-- webpack 的执行依赖于 webpack-cli，而webpack-cli中代码执行时，才是真正利用webpack进行编译和打包的过程
+- 执行 webpack 命令会执行 node_modules 下的 \.bin 目录下的 webpack
+- webpack 的执行依赖于 webpack-cli，而 webpack-cli 中代码执行时，才是真正利用 webpack 进行编译和打包的过程
 
 #### 3、npx 命令：
 
-npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$PATH`里面，检查命令是否存在
+npx webpack：npx 的作用： 默认去 node_modules/.bin 路径和环境变量 `$PATH` 里面，检查命令是否存在
 
 #### 4、webpack.config.js
 
-执行 webpack 命令，会先看看有没有 webpack.config.js 文件，如果有，会合并这里分配置
+执行 webpack 命令，会先看看有没有 webpack.config.js 文件，如果有，会合并这里的配置
 
 可以通过命令改变，不使用 webpack.config.js
 
@@ -25,7 +25,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 "scripts": {
     "build": "webpack --config wp.config.js"
 }
-// 这样就会默认去合并 wp.config.js 下的配置
+// 这样就会默认去合并 wp.config.js 里的配置
 ```
 
 #### 5、基本打包原则
@@ -43,7 +43,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
 
 #### 7、webpack 的模块化
 
-> 备注：代码在 test/module/code 中
+> 代码放在 test/module 中，打包后的结果是基于 webpack5.24.4，不同版本的打包结果可能不一样，但是思路基本是一致的
 
 在 webpack 中，可以使用各种各样的模块化，包括 CommonJS、ES Module 等
 
@@ -79,7 +79,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
   打包后产物：
 
   ```js
-  // 最外层就是一个自制行函数
+  // 最外层就是一个自执行函数
   (function () {
     // 定义了一个对象去存储模块
     // 模块的路径是对象的 key，模块的代码封装在一个函数里作为是对象的 value
@@ -219,7 +219,7 @@ npx webpack：npx 的作用： 默认去node_modules/.bin路径和环境变量`$
         for (var key in definition) {
           // 如果一个 key 在 definition 中，而不在 exports 中
           if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-            // 为 module 的 exports 代理到 definition，访问 module.exports 的 key 会被代理到 definition，访问
+            // 为 module 的 exports 代理到 definition，访问 module.exports 的 key 会被代理到 definition
             // 也就是说 exports 本身并没有 { sum: Function, mul: Function }，访问 sum 的时候实际上读取的是 definition 的
             Object.defineProperty(exports, key, { enumerable: true, get: definition[key] })
           }
@@ -465,14 +465,14 @@ module.exports = {
 
   > 思考：类似 vue 的脚手架，默认就是 `publicPath: '/'`，那么直打开 index.html，是没有类似 `http://localhost:3000/` 这样的一个服务，而是协议头类似 `file://` 这样的，那么按照 域名+路径 的方式就加载不到。所以可以改为 ./ 的形式
 
-- 
+- chunkFilename：对非入口的 chunk 命名（例如异步代码单独打包出来的文件，配合 /* webpackChunkName: 'sub' */ 这个魔法注释）
 
 ```js
 moodule.exports: {
     // 出口
     output: {
         filename: "js/bundle.js", // 出口文件名
-        path: path.resolve(__dirname, "dist") // 全局路径，这个必须是绝对路径
+        path: path.resolve(__dirname, "dist") // 输出的全局路径，这个必须是绝对路径
     }
 }
 ```
@@ -541,9 +541,9 @@ npm i style-loader css-loader sass-loader node-sass -D
 
 
 
-一般在项目中是使用 url-loader，因为 url-loader 可以将图片文件，转成 base64 的 URI，直接打包到 bundle.js 中
+一般在项目中使用 url-loader，因为 url-loader 可以将图片文件，转成 base64 的 URI，直接打包到 bundle.js 中
 
-- 小的图片转换base64之后可以和页面一起被请求，减少不必要的请求过程
+- 小的图片转换 base64 之后可以和页面一起被请求，减少不必要的请求过程
 - 如果大的图片也进行转换，那么会导致 bundle.js 过大，反而会影响页面的请求速度
 
 所以，对于是否转换需要一个阈值，一般只会将一些 icon 小图标转换为 base64
@@ -554,8 +554,8 @@ url-loader 使用的一些 placeholder（空间占位符）：
 
 - [ext]： 原文件扩展名
 - [name]：原文件名
-- [hash]：文件的内容，使用MD4的散列函数处理，生成的一个128位的hash值（32个十六进制）
-- [hash:<length>]：截图hash的长度，默认32个字符太长了
+- [hash]：文件的内容，使用 MD4 的散列函数处理，生成的一个 128 位的 hash 值（32个十六进制）
+- [hash:<length>]：截取 hash 的长度，默认 32 个字符太长了
 
 安装：
 
@@ -571,8 +571,8 @@ npm i url-loader -D
     use: [{
         loader: "url-loader",
         options: {
-            limit: 8 * 1024, // 小于 8k 将转换为 base64，不应该将过大的图片转换为 base64，这样会增加图片体积
-            name: "[name]_[hash:8].[ext]",
+            limit: 8 * 1024, // 小于 8k 将转换为 base64，不应该将过大的图片转换为 base64，这样会增加 bundle 体积
+            name: "[name]_[hash:8].[ext]", // 输出的图片名，拼接 hash
             outputPath: "images" // 输出到 dist 下哪个目录
         }
     }]
@@ -593,9 +593,9 @@ npm i html-withimg-loader -D
 
 #### 6、 编译 html 使用 html-webpack-pligin
 
-在 webpack 中，是需要一个 html 模板的，这个 html 模板可以通过 html-webpack-pligin 自动生成，当然，也可以新建一个 index.html 模板，一般都这样做，因为可以通过 ejs 语法动态插值。而且，html-webpack-pligin 生成的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等
+在 webpack 中，是需要一个 html 模板的，这个 html 模板可以通过 html-webpack-pligin 自动生成默认模板；当然，也可以新建一个 index.html 模板，一般新建一个，因为可以通过 ejs 语法动态插值。通过 html-webpack-pligin 根据自定义模板生成的 html 会自动引入 bundle.js。除此以外，还可以做一些优化 html 的工作，比如压缩一行等。
 
-html-webpack-pligin 是根据 .ejs 文件去生成的 html 模板
+通过 html-webpack-pligin 源码，可以看出是根据 .ejs 文件去生成的 html 模板
 
 ![](/imgs/img3.png)
 
@@ -607,7 +607,7 @@ npm i html-webpack-plugin -D
 
 使用：
 
-- template：以什么为模板
+- template：以什么为模板，不传，使用默认
 - inject：打包后的资源插入的位置
   - true：默认值
   - false：不注入
@@ -629,9 +629,12 @@ plugins: [
 
 除了这样，还可以通过一些参数去动态插值到 html 模板
 
-> 注意，使用了 html-withimg-loader 后 <%= %> 这些语句不生效；注释掉 html-withimg-loader  后在入口 entry: ['./src/js/index.js', './src/index.html'], // 加 index.html 主要是 html 修改不会热替换  要删除 './src/index.html'
+> 注意，使用了 html-withimg-loader 后 <%= %> 这些语句不生效，需要：
+>
+> - 注释掉 html-withimg-loader
+> - 后在入口 entry: ['./src/js/index.js', './src/index.html'] 删除 './src/index.html'
 
-index.html
+index.html：
 
 ```js
 <!DOCTYPE html>
@@ -739,7 +742,7 @@ new CopyWebpackPlugin({
 
 **使用 webpack-dev-server**
 
-webpack-dev-server 在编译之后不会写入到任何输出文件。而是将 bundle 文件保留在内存中。实现这一点主要是使用了一个库 [memory-fs](https://github.com/webpack/memory-fs) 这个库是由webpack 本身维护的，后来不再使用，改为使用 [memfs](https://github.com/streamich/memfs) 
+webpack-dev-server 在编译之后不会写入到任何输出文件。而是将 bundle 文件保留在内存中。实现这一点借助了一个库 [memory-fs](https://github.com/webpack/memory-fs) 这个库是由 webpack 本身维护的，后来不再使用，改为使用 [memfs](https://github.com/streamich/memfs) 
 
 ![](/imgs/img18.png)
 
@@ -759,7 +762,7 @@ npm i webpack-dev-server -D
 }
 ```
 
-> 这样已经可以直接开启一个本地服务。
+> 执行 npm run serve ，这样已经可以开启一个本地服务。
 
 
 
@@ -1017,6 +1020,8 @@ devServer: {
       },
 }
 ```
+
+
 
 proxy 的 secure：默认情况下，是**不支持代理到 https ** 的服务器上的，如果需要代理到 https，将 secure 的值设置为 false
 

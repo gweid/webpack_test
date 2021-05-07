@@ -57,7 +57,7 @@
       for (var key in definition) {
         // 如果一个 key 在 definition 中，而不在 exports 中
         if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-          // 为 module 的 exports 代理到 definition，访问 module.exports 的 key 会被代理到 definition，访问
+          // 为 module 的 exports 代理到 definition，访问 module.exports 的 key 会被代理到 definition
           // 也就是说 exports 本身并没有 { sum: Function, mul: Function }，访问 sum 的时候实际上读取的是 definition 的
           Object.defineProperty(exports, key, { enumerable: true, get: definition[key] })
         }

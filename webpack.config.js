@@ -56,7 +56,7 @@ const webpackConfig = (env, options) => {
         MODE === 'development'
           ? 'js/[name]_bundle.[hash:8].js'
           : 'js/[name]_bundle.[contenthash:8].js', // contenthash: 文件 hash，根据文件来生成 hash
-      path: path.resolve(__dirname, 'dist'), // 全局路径，这个必须是绝对路径
+      path: path.resolve(__dirname, 'dist'), // 输出的全局路径，这个必须是绝对路径
       publicPath: MODE === 'development' ? '' : '', // 所有资源引入公共路径前缀
       chunkFilename: 'js/[name]_chunk.[contenthash:8].js', // 对非入口的 chunk 命名（例如异步代码单独打包出来的文件，配合 /* webpackChunkName: 'sub' */ 这个魔法注释）
       // library: '[name]', // 整个库向外暴露的名字
@@ -146,8 +146,8 @@ const webpackConfig = (env, options) => {
                   loader: 'url-loader',
                   options: {
                     esModule: false, // 将 url-loader 使用 es6 的引入改为 CommonJS
-                    limit: 8 * 1024, // 小于 8k 将转换为 base64, 不应该将过大的图片转换为 base64，这样会增加图片体积
-                    name: '[name]_[hash:8].[ext]',
+                    limit: 8 * 1024, // 小于 8k 将转换为 base64, 不要将过大的图片转换为 base64，因为会增加 bundle 体积
+                    name: '[name]_[hash:8].[ext]', // 输出的图片名，拼接 hash
                     outputPath: 'images', // 输出到 dist 下哪个目录
                   },
                 },
