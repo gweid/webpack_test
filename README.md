@@ -1,4 +1,4 @@
-# webpack 认知
+# hard-source-webpack-pluginwebpack 认知
 
 #### 1、本质：
 
@@ -2312,7 +2312,47 @@ dll 的使用分为两步：
 
 
 
-#### e、配置文件别名
+#### e、HardSourceWebpackPlugin
+
+dll 构建速度已经不明显了，更好的替代方案是使用 HardSourceWebpackPlugin，并且在 webpack5 已经内置这个插件。在 webpack4 中需要下载插件是使用：
+
+安装：
+
+```js
+npm i hard-source-webpack-plugin -D
+```
+
+使用：
+
+```js
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+
+module.exprts = {
+  // ...
+  
+  plugins: [
+    new HardSourceWebpackPlugin()
+  ]
+}
+```
+
+相对于 dll 简单得多，而且性能的提升比 dll 更加明显。
+
+> HardSourceWebpackPlugin 第一次打包没有变化，但是第二次之后打包变化特别大。
+
+
+
+**对比 dll：**
+
+|   hard-source-webpack-plugin   |                DLL                |
+| :----------------------------: | :-------------------------------: |
+| 把常用的文件存储到内存或硬盘中 | 把公共代码打包为dll文件放到硬盘中 |
+|    再次打包时直接取读取缓存    |  再次打包时读取dll文件不重新打包  |
+|          加载时间减少          |           打包时间减少            |
+
+
+
+#### f、配置文件别名
 
 -   优点：减少打包时的搜索文件时间
 

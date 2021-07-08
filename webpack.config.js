@@ -8,6 +8,7 @@ const webpack = require('webpack')
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin') // pwa
 const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin') // 动态使用 cdn
 const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 // const AutodllWebpackPlugin = require('autodll-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin') // 压缩 js
 const { CleanWebpackPlugin } = require('clean-webpack-plugin') // 打包时先清空 dist 目录 webpack4 之后这样引入
@@ -254,14 +255,17 @@ const webpackConfig = (env, options) => {
         ],
       }),
 
-      // 通过 DllReferencePlugin 插件告知要使用的 DLL 库
-      new webpack.DllReferencePlugin({
-        manifest: path.resolve(__dirname, 'dll', 'zepto.manifest.json'),
-      }),
-      // 通过 AddAssetHtmlWebpackPlugin 将 dll 库引入到 html 模板中
-      new AddAssetHtmlWebpackPlugin({
-        filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
-      }),
+      // // 通过 DllReferencePlugin 插件告知要使用的 DLL 库
+      // new webpack.DllReferencePlugin({
+      //   manifest: path.resolve(__dirname, 'dll', 'zepto.manifest.json'),
+      // }),
+      // // 通过 AddAssetHtmlWebpackPlugin 将 dll 库引入到 html 模板中
+      // new AddAssetHtmlWebpackPlugin({
+      //   filepath: path.resolve(__dirname, 'dll', 'dll_zepto.js'),
+      // }),
+
+      // 使用 HardSourceWebpackPlugin 替代 dll
+      new HardSourceWebpackPlugin(),
 
       // 分析包大小
       process.env.NODE_ENV === 'analyzer' && new BundleAnalyzerPlugin()
