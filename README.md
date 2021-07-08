@@ -2,18 +2,52 @@
 
 #### 1、本质：
 
-本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle
+本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle。
+
+<img src="./imgs/img40.png" style="zoom: 67%;" />
+
+
 
 #### 2、安装：
 
-使用 webpack 目前需要安装 webpack、webpack-cli
+```js
+npm i webpack webpack-cli
+```
+
+使用 webpack 目前需要安装 webpack、webpack-cli：
 
 - 执行 webpack 命令会执行 node_modules 下的 \.bin 目录下的 webpack
 - webpack 的执行依赖于 webpack-cli，而 webpack-cli 中代码执行时，才是真正利用 webpack 进行编译和打包的过程
 
+
+
 #### 3、npx 命令：
 
-npx webpack：npx 的作用： 默认去 node_modules/.bin 路径和环境变量 `$PATH` 里面，检查命令是否存在
+在以往，如果需要使用 eslint 命令，首先需要安装 eslint，然后去到对应目录执行：
+
+```js
+./node_modules/.bin/eslint --init
+./node_modules/.bin/eslint yourfile.js
+```
+
+或者使用 package.json 的 script 脚本。
+
+
+
+但是使用了 npx，只需要：
+
+```js
+npx eslint --init
+npx eslint yourfile.js
+```
+
+npx 的作用： 
+
+- 默认去 node_modules/.bin 路径和环境变量 `$PATH` 里面，检查命令是否存在。
+
+- 另一个更实用的好处是：npx 执行模块时会优先安装依赖，但是在安装执行后便删除此依赖，这就避免了全局安装模块带来的问题
+
+
 
 #### 4、webpack.config.js
 
@@ -28,18 +62,24 @@ npx webpack：npx 的作用： 默认去 node_modules/.bin 路径和环境变量
 // 这样就会默认去合并 wp.config.js 里的配置
 ```
 
+
+
 #### 5、基本打包原则
 
 - 在 webpack 执行的时候，会根据命令或者配置文件找到入口文件
 - 从入口文件开始，查找出每一个依赖，生成一个依赖图
-- 然后遍历递归依赖图，根据文件不同，使用不同loader 处理文件，打包一个个模块
+- 然后遍历递归依赖图，根据文件不同，使用不同 loader 处理文件，打包一个个模块
 - 最后将结果输出（当然，中间打包的过程可以通过 plugin 控制整个生命周期）
+
+
 
 #### 6、loader 和 plugin 差别
 
 **loader：** loader 是在对模块进行转换的时候起作用
 
 **plugin：** plugin 可以贯穿整个 webpack 的生命周期，执行更加广泛的任务，比如打包优化、资源管理等
+
+
 
 #### 7、webpack 的模块化
 
@@ -404,6 +444,8 @@ npx webpack：npx 的作用： 默认去 node_modules/.bin 路径和环境变量
 
 # 基础功能
 
+
+
 #### 1、基础出入口
 
 **入口：**
@@ -453,15 +495,15 @@ module.exports = {
 
   - 的默认值是一个空字符串，所以打包后引入 js 文件时，路径是 bundle.js
 
-    ![](/imgs/img20.png)
+     ![](/imgs/img20.png)
 
   - 在开发中，我们也将其设置为 / ，路径是 /bundle.js，那么浏览器会根据所在的域名+路径去请求对应的资源
 
-    ![](/imgs/img21.png)
+     ![](/imgs/img21.png)
 
   - 如果希望在本地直接打开 html 文件来运行，会将其设置为 ./，路径是 ./bundle.js，可以根据相对路径去查找资源
 
-    ![](/imgs/img22.png)
+     ![](/imgs/img22.png)
 
   > 思考：类似 vue 的脚手架，默认就是 `publicPath: '/'`，那么直打开 index.html，是没有类似 `http://localhost:3000/` 这样的一个服务，而是协议头类似 `file://` 这样的，那么按照 域名+路径 的方式就加载不到。所以可以改为 ./ 的形式
 
@@ -477,6 +519,8 @@ moodule.exports: {
 }
 ```
 
+
+
 #### 2、mode
 
 在 webpack 中，有三种模式 mode，是 webpack 为了简化配置
@@ -485,15 +529,15 @@ moodule.exports: {
 
 **mode=development： 相当于做了以下的配置**
 
-![](/imgs/img4.png)
+ ![](/imgs/img4.png)
 
 **mode=production： 相当于做了以下的配置**
 
-![](/imgs/img5.png)
+ ![](/imgs/img5.png)
 
 **mode=none： 相当于做了以下的配置**
 
-![](/imgs/img6.png)
+ ![](/imgs/img6.png)
 
 设置： 
 
@@ -512,11 +556,19 @@ module.exports = {
 }
 ```
 
+
+
 #### 3、css/scss/less 这些 loader
 
-```
-npm i style-loader css-loader sass-loader node-sass -D
+安装：
 
+```js
+npm i style-loader css-loader sass-loader node-sass -D
+```
+
+使用：
+
+```
 {
     test: /\.css$/,
     use: [
@@ -534,6 +586,8 @@ npm i style-loader css-loader sass-loader node-sass -D
     ]
 }
 ```
+
+
 
 #### 4、图片 loader
 
@@ -555,7 +609,7 @@ url-loader 使用的一些 placeholder（空间占位符）：
 - [ext]： 原文件扩展名
 - [name]：原文件名
 - [hash]：文件的内容，使用 MD4 的散列函数处理，生成的一个 128 位的 hash 值（32个十六进制）
-- [hash:<length>]：截取 hash 的长度，默认 32 个字符太长了
+- [hash:\<length\>]：截取 hash 的长度，默认 32 个字符太长了
 
 安装：
 
@@ -579,6 +633,8 @@ npm i url-loader -D
 }
 ```
 
+
+
 #### 5、当图片是直接通过 img 便签引入，需要使用 html-withimg-loader
 
 ```
@@ -590,6 +646,8 @@ npm i html-withimg-loader -D
     loader: "html-withimg-loader" // 主要将 html 中使用 img 标签引入的图片使用动态路径 <img src="./aa.jpg">
 }
 ```
+
+
 
 #### 6、 编译 html 使用 html-webpack-pligin
 
@@ -709,6 +767,8 @@ new CopyWebpackPlugin({
 }),
 ```
 
+
+
 #### 7、开发环境自动编译
 
 常见的在开发环境进行自动编译方式：
@@ -744,7 +804,7 @@ new CopyWebpackPlugin({
 
 webpack-dev-server 在编译之后不会写入到任何输出文件。而是将 bundle 文件保留在内存中。实现这一点借助了一个库 [memory-fs](https://github.com/webpack/memory-fs) 这个库是由 webpack 本身维护的，后来不再使用，改为使用 [memfs](https://github.com/streamich/memfs) 
 
-![](/imgs/img18.png)
+ ![](/imgs/img18.png)
 
 安装：
 
@@ -908,7 +968,7 @@ localhost 和 0.0.0.0 的区别
 
 - compress：为静态文件开启 gzip，true 开启
 
-  ![](/imgs/img23.png)
+   ![](/imgs/img23.png)
 
 
 
@@ -1079,6 +1139,8 @@ plugins: [
 ]
 ```
 
+
+
 #### 9、抽离 css
 
 -   注意：抽离 css 需要配置一下 miniCssExtractPlugin 的 publicPath， 不然 CSS 里面的图片路径是以 CSS 目录为根目录的
@@ -1123,6 +1185,8 @@ plugins: [
 ]
 ```
 
+
+
 #### 10、配置 css 浏览器兼容
 
 使用 postcss-loader + autoprefixer
@@ -1152,12 +1216,17 @@ plugins: [
     - 在 node_modules/browserslist/index.js 下引入了 caniuse-lite 去判断
 
   - 查看浏览器市场占有率：https://www.caniuse.com/usage-table
-- 在 webpack 中配置 postcss-loader
+
+
+
+**使用 autoprefixer：**
+
+在 webpack 中配置 postcss-loader
 
 ```
 npm i postcss-loader autoprefixer -D
 
-postcss.config.js 中
+// postcss.config.js 中
 module.exports = {
     // autoprefixer 没用需要设置 browserslist
     plugins: [
@@ -1165,14 +1234,14 @@ module.exports = {
     ]
 }
 
-package.json 中
+// package.json 或者单独的 .browserslistrc 文件
 "browserslist": [
     "last 1 version", // 即支持各类浏览器最近的一个版本
-    "> 0.2%",  // 支持市场份额大于 0.2% 的浏览器。
+    "> 0.2%",  // 支持市场份额大于 0.2% 的浏览器
     "not dead" // 除了死亡的浏览器
 ]
 
-webpack.config.js
+// webpack.config.js
 {
     test: /\.css$/,
     use: [
@@ -1227,7 +1296,9 @@ webpack.config.js
 }
 ```
 
-**postcss-preset-env：**
+
+
+**使用 postcss-preset-env：**
 安装：
 
 ```js
@@ -1256,6 +1327,8 @@ npm i postcss-preset-env -D
 }
 ```
 
+
+
 **使用 @import "./test.css" 问题：**
 
 当在 index.css 中通过 @import "./test.css" 引入 css，那么这个引入的 css 是不会被 postcss-loader 去处理的，因为 @import "./test.css" 属于 css 语法，不属于 js，直接被 css-loader 处理，那么需要配置一下 css-loader
@@ -1263,6 +1336,7 @@ npm i postcss-preset-env -D
 - importLoaders 的值取决于 css-loader 之前还有几个 loader，如这里，之前只有一个 postcss-loader，那么值为 1
 
 ```js
+// 在 webpack.config.js 中
 {
     test: /\.css$/,
     use: [
@@ -1273,22 +1347,21 @@ npm i postcss-preset-env -D
                 importLoaders: 1
             }
         }, // 将 css 以模块引入
-        {
-            loader: "postcss-loader",
-            option,
-            options: {
-                importLoaders: 1
-}s: {
-                postcssOptions: {
-                    plugins: [
-                        require('postcss-preset-env')
-                    ]
-                }
-            }
-        }
+        'postcss-loader'
+    ]
+}
+
+
+// 在 postcss.config.js 中
+module.exports = {
+    // 还需要设置 browserslist
+    plugins: [
+        require('postcss-preset-env')
     ]
 }
 ```
+
+
 
 #### 11、压缩 css 
 
@@ -1324,6 +1397,8 @@ plugins: [
 ]
 ```
 
+
+
 #### 12、babel 做 js 兼容性处理
 
 **12-1、什么是babel：**
@@ -1332,11 +1407,13 @@ babel 是一个工具链，用于将 ES6+ 的代码转换为向下兼容的 JS �
 
 并且 babel 和 postcss 一样，是一个独立的工具，并不是说必须依赖于 webpack 才能使用，只是 babel 在 webpack 中使用提供了 babel-loader
 
+
+
 **12-2、babel 基本原理：**
 
 > 备注：代码在 test/babel 中
 
-babel 其实就是一个编译器，将我们的源代码转换为另外一种源代码（目标代码）
+babel 其实就是一个转译器，将我们的源代码转换为另外一种源代码（目标代码）
 
 其基本编译流程
 
@@ -1379,6 +1456,8 @@ babel 其实就是一个编译器，将我们的源代码转换为另外一种�
 - 对 ast 语法树进行遍历（traversal）、访问（visitor），当遇到某一个节点符合需要使用某个 plugin 进行转换的条件，那么使用这个 plugin 转换节点；最后生成一个新的 ast
 
 - 根据新的 ast 生成转换后的代码
+
+
 
 **12-3、babel-loder 的使用：**
 
@@ -1430,6 +1509,8 @@ npm i babel-loader @babel/core @babel/preset-env core-js -D
 }
 ```
 
+
+
 **12-4、babel 的配置文件**
 
 babel 的配置信息可以单独配置在一个文件里面
@@ -1438,18 +1519,15 @@ babel 的配置信息可以单独配置在一个文件里面
 
 babel 提供了两种单独配置的方式
 
-babel 提供了两种单独配置的方式
-
 - babel.config.json（或者.js，.cjs，.mjs）文件
 - .babelrc.json（或者.babelrc，.js，.cjs，.mjs）文件
 
-目前很多的项目都采用了多包管理的方式，`.babelrc.json` 对于配置Monorepos项目是比较麻烦的，所以更推荐的是 `babel.config.js` 的方式
+目前很多的项目都采用了多包管理的方式，`.babelrc.json` 对于配置 Monorepos 项目是比较麻烦的，所以更推荐的是 `babel.config.js` 的方式
 
 使用：
 
-在 babel.config.js 中：
-
 ```js
+// 在 babel.config.js 中
 module.exports = {
   presets: [
     [
@@ -1476,6 +1554,8 @@ module.exports = {
 },
 ```
 
+
+
 **12-5、认识 polyfill**
 
 主要的意思就是垫片、补丁
@@ -1485,14 +1565,14 @@ module.exports = {
 使用：
 
 - 在 babel 7.40 之前，通常使用 @babel/polyfill的包
-- babel7.4.0之后，已经不推荐使用 @babel/polyfill；而是单独引入core-js 和 regenerator-runtime 来完成 polyfill 的使用
+- babel7.4.0 之后，已经不推荐使用 @babel/polyfill；而是单独引入core-js 和 regenerator-runtime 来完成 polyfill 的使用
 
 在 babel.config.js 中配置 polyfill：
 
 - useBuiltIns：设置以什么样的方式来使用 polyfill 
-  - false：打包后的文件不使用polyfill来进行适配
+  - false：打包后的文件不使用 polyfill 来进行适配
   - usage：会根据源代码中出现的语言特性，按需加载所需要的 polyfill，这样可以确保最终包里的 polyfill 数量的最小化；可以配合 corejs 版本使用。直接使用 usage 可能会有问题，比如一些第三方库本身有自己的 polyfill ，那么就可能就有冲突，**所以需要配置 babel-loader 忽略 node_modules; `exclude: /node_modules/,`**
-  - entry：如果我们依赖的某一个库本身使用了某些 polyfill 的特性，但是因为我们使用的是usage，所以之后用户浏览器可能会报错。如果担心出现这种情况，可以使用 entry。此时就需要在**入口文件手动**添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime'。但是这样做会根据 browserslist 目标导入所有的polyfill，对应的包也会变大
+  - entry：如果我们依赖的某一个库本身使用了某些 polyfill 的特性，但是因为我们使用的是 usage，所以之后用户浏览器可能会报错。如果担心出现这种情况，可以使用 entry。此时就需要在**入口文件手动**添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime'。但是这样做会根据 browserslist 目标导入所有的 polyfill，对应的包也会变大
 - corejs：设置corejs 的版本，目前使用比较多的是 3.x 版本；也可以设置是否对提议阶段的特性进行支持，将 proposals 属性设为 true 即可
 
 ```js
@@ -1511,9 +1591,11 @@ module.exports = {
 };
 ```
 
-**12-7、了解 Plugin-transform-runtime**
 
-在使用 useBuiltIns + corejs 配置 polyfill 的时候，默认情况是添加的所有特性都是全局的；如果我们正在编写一个工具库，这个工具库需要使用 polyfill； 别人在使用我们工具时，工具库通过polyfill添加的特性，可能会污染它们的代码；所以，当编写工具时，babel 更推荐使用一个插件： @babel/plugin-transform-runtime 来完成polyfill 的功能
+
+**12-6、了解 Plugin-transform-runtime**
+
+在使用 useBuiltIns + corejs 配置 polyfill 的时候，默认情况是添加的所有特性都是全局的；如果我们正在编写一个工具库，这个工具库需要使用 polyfill； 别人在使用我们工具时，工具库通过 polyfill 添加的特性，可能会污染它们的代码；所以，当编写工具时，babel 更推荐使用一个插件： @babel/plugin-transform-runtime 来完成polyfill 的功能
 
 安装：
 
@@ -1549,7 +1631,9 @@ module.exports = {
 
 > 这个只是开发第三方库的时候需要注意的，平常使用 useBuiltIns + corejs 即可
 
-**12-8、babel 对 JSX 的转换**
+
+
+**12-7、babel 对 JSX 的转换**
 
 只需要安装：
 
@@ -1569,11 +1653,13 @@ module.exports = {
 };
 ```
 
-**12-9、babel 对 ts 的准换**
 
-在 webpack 中使用 ts，可以：
 
-- 使用 ts-loader
+**12-8、babel 对 ts 的准换**
+
+在 webpack 中使用 ts，有两种方案：
+
+- 第一种，使用 ts-loader
 
   安装：
 
@@ -1599,7 +1685,7 @@ module.exports = {
 
      `modules/es.promise */ "./node_modules/core-js/modules/es.promise.js");`
 
-- 使用 @babel/preset-typescript
+- 第二种，使用 @babel/preset-typescript
 
   安装：
 
@@ -1629,6 +1715,8 @@ module.exports = {
      }
      ```
 
+
+
 两种编译 ts 的方法对比：
 
 - ts-loader + babel-loader：编译时间稍微多点，编译有错误提示
@@ -1654,7 +1742,9 @@ module.exports = {
   },
   ```
 
-12-、了解 babel 的 Stage-X **
+
+
+**12-9、了解 babel 的 Stage-X **
 
 主要就是分阶段加入不同的语言特性
 
@@ -1664,7 +1754,7 @@ module.exports = {
 - Stage 3：Stage 3 提案是建议的候选提案。在这个高级阶段，规范的编辑人员和评审人员必须在最终规范上签字。**Stage 3 的提案不会有太大的改变，在对外发布之前只是修正一些问题**
 - Stage 4：finished（完成），进入 Stage 4 的提案将包含在 ECMAScript 的下一个修订版中
 
-在 babel 中，常看见使用：
+在 babel 老版本中，常看见使用：
 
 ```js
 {
@@ -1681,9 +1771,23 @@ module.exports = {
 
 > 在 babel 7 开始，已经不建议使用 Stage-X 了，而是使用 preset-env
 
+
+
+**12-10、babel 的 preset 与 plugin**
+
+- Babel Plugin 一般尽可能拆成小的力度，开发者可以按需引进。比如对 ES6 转 ES5 的功能，Babel 官方拆成了 20+ 个 Plugin。  
+
+- 这样的好处显而易见，既提高了性能，也提高了扩展性。比如开发者想要体验 ES6 的箭头函数特性，那他只需要引入 `transform-es2015-arrow-functions` 插件就可以，而不是加载 ES6 全家桶。
+
+- 但很多时候，逐个插件引入的效率比较低下。比如在项目开发中，开发者想要将所有 ES6 的代码转成 ES5，插件逐个引入的方式令人抓狂，不单费力，而且容易出错。
+
+- 这个时候，可以采用 Babel Preset。可以简单的把 Babel Preset 视为 Babel Plugin 的集合。比如 `babel-preset-es2015` 就包含了所有跟 ES6 转换有关的插件。
+
+
+
 #### 13、js 压缩
 
-在 webpack4，**只要将 mode 改为 production 将自动压缩 js 代码** 或者在 package.json 中把 mode 配置。主要是 webpack4 以上如果是生产环境，默认使用的是 terser 去对代码进行压缩
+在 webpack4，**只要将 mode 改为 production 将自动压缩 js 代码** 。主要是 webpack4 以上如果是生产环境，默认使用的是 terser 去对代码进行压缩
 
 > 早期，很多使用 uglify-js 来对代码进行压缩，但是目前已经不再维护，并且不支持ES6+的语法，Terser 是从 uglify-es fork 过来的，并且保留它原来的大部分API以及适配 uglify-es 和 uglify-js@3 等
 
@@ -1703,7 +1807,7 @@ npm i terser-webpack-plugin -D
 
   默认为 true，会生成一份注释文件
 
-  ![](/imgs/img31.png)
+   ![](/imgs/img31.png)
 
   一般不需要，设置为 false
 
@@ -1738,11 +1842,11 @@ module.exports = {
 }
 ```
 
+
+
 #### 14、html 压缩
 
-使用 html-webpack-plugin
-
-安装：
+使用 html-webpack-plugin，安装：
 
 ```js
 npm i html-webpack-plugin -D
@@ -1765,6 +1869,8 @@ plugins: [
     })
 ]
 ```
+
+
 
 #### 15、ESLint
 
@@ -1816,19 +1922,21 @@ devServer: {
 
 - 安装 ESLint 插件
 
-  ![](/imgs/img15.png)
+   ![](/imgs/img15.png)
 
   那么就可以在写代码期间编译器就会有代码风格错误提示
 
 - 安装 Prettier 插件
 
-  ![](/imgs/img16.png)
+   ![](/imgs/img16.png)
 
   并且配置
 
   ![](/imgs/img17.png)
 
   再在项目 .eslintrc.js 同级目录 下新建 .prettierrc 里面配置需要使用的 prettier 规则，就可以在保存的时候自动修正代码规范
+
+
 
 #### 16、编译 Vue 文件
 
@@ -1887,7 +1995,7 @@ resolve 用于设置模块如何被解析，比如我们自己写的模块或者
 
 resolve 常用的属性：
 
-- mainFiles：如果引用是文件夹时，需要指定的文件，默认是 ['index']
+- mainFiles：如果引用是文件夹时，需要指定这个文件夹下的哪个文件，默认是 ['index']
 
   ```js
   module.exports = {
@@ -1923,7 +2031,11 @@ resolve 常用的属性：
 
 # webpack 性能优化
 
+
+
 ## 一、开发环境性能优化
+
+
 
 ### 1、优化构建速度
 
@@ -1951,19 +2063,21 @@ devServer: {
 },
 ```
 
+
+
 ### 2、优化代码调试 source-map: 源代码到构建代码的映射
 
 经过 webpack 编译后：
 
 - 真实跑在浏览器上的代码，和我们编写的代码其实是有差异的；
 
-- 比如ES6的代码可能被转换成ES5；
+- 比如 ES6 的代码可能被转换成 ES5；
 
 - 比如对应的代码行号、列号在经过编译后肯定会不一致；
 
 - 比如代码进行丑化压缩时，会将编码名称等修改；
 
-- 比如我们使用了TypeScript等方式编写的代码，最终转换成JavaScript
+- 比如我们使用了 TypeScript 等方式编写的代码，最终转换成 JavaScript
 
 而 source-map 可以通过映射关系在构建后的代码中找到错误代码在源代码所在位置
 
@@ -1981,12 +2095,12 @@ devServer: {
 
 1. 在 webpack 打包的时候，根据 devtool 生成 source-map
 
-2. 在 打包后的产物 bundle.js 最后添加一行注释 `//# sourceMappingURL=bundle.js.map`
+2. 在打包后的产物 bundle.js 最后添加一行注释 `//# sourceMappingURL=bundle.js.map`
 3. 浏览器会这行注释，查找响应的 source-map
 
 **webpack 中 devtool 配置：**
 
-不同的配置生成的 source-map 也会有差异，而且会影响打包性能。而 devtool 的值有多达 26 个
+不同的配置生成的 source-map 也会有差异，而且会影响打包性能。而 devtool 的值可以通过组合多达 26 种情况
 
 1. 不会生成 source-map 的情况：
 
@@ -2004,13 +2118,13 @@ devServer: {
 
 2. source-map：生成一份完整的 source-map 文件
 
-   ![](/imgs/img9.png)
+    ![](/imgs/img9.png)
 
    错误也会准确被定位：
 
    ![](/imgs/img10.png)
 
-3. eval-source-map：会生成 sourcemap，但是source-map 是以 DataUrl 形式添加到 **eval 函数**的后面
+3. eval-source-map：会生成 sourcemap，但是 source-map 是以 DataUrl 形式添加到 **eval 函数**的后面
 
    ![](/imgs/img11.png)
 
@@ -2024,7 +2138,7 @@ devServer: {
 
 5. cheap-source-map：会生成 sourcemap，而且是外部 source-map文件，但 cheap 会更加高效一些（cheap低开销），因为它没有生成列映射（即报错信息是整个一行都标红），在开发中，通常只需要行信息通常就可以定位到错误了
 
-   ![](/imgs/img13.png)
+    ![](/imgs/img13.png)
 
    可以看到，错误定位到了某一行，而没有定位到 abc 上
 
@@ -2048,7 +2162,7 @@ webpack 对于 source-map 提供了 26 个值，是可以进行多组合的
 
 - nosources：可选值
 
-- cheap可选值，并且可以跟随module的值
+- cheap可选值，并且可以跟随 module 的值
 
   ```js
   [inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map
@@ -2064,11 +2178,13 @@ webpack 对于 source-map 提供了 26 个值，是可以进行多组合的
 
 ## 二、生产环境性能优化
 
+
+
 ### 1、优化打包速度
 
 #### a、oneOf
 
--   就是有很多 loader，每个文件都会被 所有的 loader 过一遍，其实这里面只有处理相关文件的 loader 会被命中(注意： 如果多个 loader 处理一个文件，需要把多出来的 loader 提到 oneOf 外面)
+-   就是有很多 loader，每个文件都会被所有的 loader 过一遍，其实这里面只有处理相关文件的 loader 会被命中(注意： 如果多个 loader 处理一个文件，需要把多出来的 loader 提到 oneOf 外面)
 
 ```
 rules: [
@@ -2080,9 +2196,11 @@ rules: [
 ]
 ```
 
+
+
 #### b、缓存
 
--   babel 缓存 就是在生产环境中，当只改变一个 js，其他没变，那么打包时不可能又把所有的 js 编译一次，这时候应该使用 babel 缓存
+-   babel 缓存就是在生产环境中，当只改变一个 js，其他没变，那么打包时不可能又把所有的 js 编译一次，这时候应该使用 babel 缓存
 
 ```
 // 使用 babel 缓存只需要在 babel 的 options 中加入 cacheDirectory: true
@@ -2098,6 +2216,8 @@ rules: [
 }
 ```
 
+
+
 #### c、多进程打包
 
 ```
@@ -2111,6 +2231,8 @@ npm i thread-loader -D
 
 'thread-loader',
 ```
+
+
 
 #### d、动态链接库 dll
 
@@ -2188,6 +2310,8 @@ dll 的使用分为两步：
 
 > 对于 dll，在升级到 webpack4 之后，vue 和 react 的脚手架都不再使用 dll，vue 作者尤雨溪的的答复是：webpack4 已经提供了足够的性能，不需要再花费额外的心思去维护 dll
 
+
+
 #### e、配置文件别名
 
 -   优点：减少打包时的搜索文件时间
@@ -2201,6 +2325,8 @@ resolve: {
   },
 },
 ```
+
+
 
 ### 2、优化代码运行性能
 
@@ -2226,11 +2352,31 @@ plugins: [
 ]
 ```
 
-#### b、tree shaking 作用：去除无用代码，减少代码体积
+
+
+#### b、tree shaking 作用
 
 tree shaking：摇树，用于消除未调用的代码，主要是 ESModule 进行 tree shaking
 
 在 webpack5 中，也提供了对部分 CommomJs 的tree shaking 能力
+
+
+
+> **Tree Shaking 为什么要依赖 ESM 规范？**
+>
+> 
+>
+> 事实上，Tree Shaking 是在编译时进行无用代码消除的，因此它需要在编译时确定依赖关系，进而确定哪些代码可以被“摇掉”，而 ESM 具备以下特点：
+>
+> - import 模块名只能是字符串常量
+>
+> - import 一般只能在模块的最顶层出现
+>
+> - import binding 是 immutable 的
+>
+> 这些特点使得 ESM 具有静态分析能力。而 CommonJS 定义的模块化规范，只有在执行代码后，才能动态确定依赖模块，因此不具备 Tree Shaking 的先天条件。
+>
+> 在传统编译型语言中，一般由编译器将无用代码在 AST（抽象语法树）中删除，而前端 JavaScript 并没有正统“编译器”这个概念，那么 Tree Shaking 就需要在工程链中由工程化工具完成。
 
 
 
@@ -2271,15 +2417,10 @@ console.log(sum(20, 30));
 ```js
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/math.js":
-/*!*********************!*\
-  !*** ./src/math.js ***!
-  \*********************/
-/***/ (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
+"./src/math.js": (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "sum": function () { return /* binding */ sum; }
-  /* harmony export */
+/* harmony export */
 });
 
         /* unused harmony export mul */
@@ -2290,21 +2431,23 @@ console.log(sum(20, 30));
         const mul = (num1, num2) => {
           return num1 * num2;
         }
-
-
-        /***/
 })
-    /******/
 })
 ```
 
-可以发现，`__webpack_require__.d` 中直接没有了 mul 函数的代码。在下面有打上魔法注释：`/* unused harmony export mul */`，这个主要是告诉 terser，可以删除这个没有被使用的函数
+webpack 对代码进行标记，主要是对 import & export 语句标记为 3 类：
 
-通过开启 treser，就可以将 mul 删除
+- 所有 import 标记为 `/* harmony import */`
+
+- 所有被使用过的 export 标记为`/* harmony export ([type]) */`，其中 `[type]` 和 webpack 内部有关，可能是 binding, immutable 等等
+
+- 没被使用过的 export 标记为`/* unused harmony export [FuncName] */`，其中 `[FuncName]` 为 export 的方法名称（可以看到上面没使用到 mul，那么就标记了 /* unused harmony export mul */；注意后面是 mul）
+
+这个主要是告诉 terser，可以删除这个没有被使用的函数；通过开启 treser，那么就可以在进行压缩的时候，将 mul 删除
 
 
 
-**sideEffects 方式：**
+**sideEffects 声明副作用：**
 
 比如，在 index.js 中，直接：
 
@@ -2314,7 +2457,7 @@ import '../css/index.css';
 import './test';
 ```
 
-这样，css 是希望可以这样引入，不要被 tree shaking 掉，而 js 不希望这样子引用而直接 tree shaking 掉，那么就可以配置 package.json 的 sideEffects，用来告诉哪些模块有副作用，不能 tree shaking 掉
+这样，css 是希望可以这样引入，不要被 tree shaking 掉，而 js 不希望这样子引用而直接 tree shaking 掉，那么就可以配置 package.json 的 sideEffects，用来告诉哪些模块有副作用，不能被 tree shaking 掉
 
 ```js
 {
@@ -2325,7 +2468,7 @@ import './test';
 }
 ```
 
-这样子代表 css、scss 文件不会被 tree shaking，而没有配置的 js 类型文件、例如 `import './test';` 将被 tree shaking 掉。*注意：是在生产环境*
+这样子代表 css、scss 文件不会被 tree shaking，而没有配置的 js 类型文件、例如 `import './test';` 将被 tree shaking 掉。*注意：是在生产环境，因为生产环境默认开启了 terser*
 
 
 
@@ -2335,7 +2478,7 @@ import './test';
 
 #### c、代码分离
 
-作用: 主要的目的是将代码分离到不同的bundle中，之后我们可以按需加载，或者并行加载这些文件，提高代码加载性能
+作用: 主要的目的是将代码分离到不同的 bundle 中，之后就可以按需加载，或者并行加载这些文件，提高代码加载性能
 
 默认情况下，所有的 JavaScript 代码（业务代码、第三方依赖、暂时没有用到的模块）在首页全部都加载， 就会影响首页的加载速度
 
@@ -2343,7 +2486,7 @@ webpack 中代码分离的方式主要有三种：
 
 - 通过多入口：entry 配置多入口
 - 防止重复：使用 Entry Dependencies（不推荐） 或者SplitChunksPlugin（官方推荐） 去重和分离代码
-- 动态倒入：通过模块的内联函数调用来分离代码
+- 动态导入：通过模块的内联函数调用来分离代码
 
 
 
@@ -2370,7 +2513,7 @@ module.exports = {
 
 **Entry Dependencies：**
 
-还有一个问题，就是如果 main.js 和 index.js 都引用了 lodash，那么分别打包，会造成两个打包后的文件都引入 lodash，解决：通过 Entry Dependencies(入口依赖)共享 lodash
+上面多入口打包有一个问题，就是如果 main.js 和 index.js 都引用了 lodash，那么分别打包，会造成两个打包后的文件都引入 lodash，解决：通过 Entry Dependencies(入口依赖)共享 lodash
 
 > 注意：开发中还是更建议直接使用 SplitChunks ,因为如果多个页面用到多个公共的第三方库，这种方式都要手动进行配置，非常不友好
 
@@ -2396,7 +2539,7 @@ module.exports = {
 }
 ```
 
-![](/imgs/img25.png)
+ ![](/imgs/img25.png)
 
 
 
@@ -2433,7 +2576,7 @@ module.exports = {
 }
 ```
 
-- cacheGroups：用于对拆分的包就行分组，比如一个lodash在拆分之后，并不会立即打包，而是会等到有没有其他符合规则的包一起来打包
+- cacheGroups：用于对拆分的包就行分组，比如一个 lodash 在拆分之后，并不会立即打包，而是会等到有没有其他符合规则的包一起再打包
 
 ```js
 module.exports = {
@@ -2456,9 +2599,9 @@ module.exports = {
 }
 ```
 
-![](/imgs/img26.png)
+ ![](/imgs/img26.png)
 
-在使用 SplitChunks  的时候，一般很少去手动设置这些属性，只需要设置 chunks： ‘all’ 基本可以，其他的使用默认设置即可。还有当需要单独对自己写的模块进行打包，设置一下 cacheGroups 即可。例如 react 跟 vue 的脚手架对 SplitChunks  的设置都比较简单
+在使用 SplitChunks  的时候，一般很少去手动设置这些属性，只需要设置 chunks： ‘all’ 基本可以，其他的使用默认设置即可。还有当需要单独对自己写的模块进行打包，设置一下 cacheGroups 即可。react 跟 vue 的脚手架对 SplitChunks  的设置都比较简单
 
 
 
@@ -2511,7 +2654,7 @@ import(/* webpackChunkName: 'sub' */ './sub').then(({ addSub }) => {
   })
 ```
 
-![](/imgs/img27.png)
+ ![](/imgs/img27.png)
 
 
 
@@ -2535,7 +2678,9 @@ btn.addEventListener('click', (e) => {
 
 懒加载在初次请求的时候并没有去请求 sub 模块，而是在点击按钮的时候才去加载模块
 
-![](/imgs/img28.png)
+ ![](/imgs/img28.png)
+
+
 
 **预加载：**体验好，兼容性差
 
@@ -2554,7 +2699,9 @@ btn.addEventListener('click', (e) => {
 
 预加载会在**浏览器空闲**的时候，去把 sub 模块加载出来
 
-![](/imgs/img29.png)
+ ![](/imgs/img29.png)
+
+
 
 #### e、optimization. runtimeChunk
 
@@ -2570,7 +2717,11 @@ runtimeChunk: {
 },
 ```
 
-#### f、pwa 渐进式网络开发应用程序 离线可访问
+
+
+#### f、pwa
+
+pwa：渐进式网络开发应用程序 离线可访问
 
 -   可靠 - 即使在网络不稳定甚至断网的环境下，也能瞬间加载并展现
 -   用户体验 - 快速响应，具有平滑的过渡动画及用户操作的反馈
@@ -2609,9 +2760,13 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
+
+
 #### g、使用 cdn
 
 CDN：内容分发网络，指通过相互连接的网络系统，利用最靠近每个用户的服务器，更快、更可靠地将音乐、图片、视频、应用程序及其他文件发送给用户，来提供高性能、可扩展性及低成本的网络内容传递给用户
+
+
 
 **CDN 基本原理：**
 
@@ -2619,17 +2774,15 @@ CDN：内容分发网络，指通过相互连接的网络系统，利用最靠�
 
 当用户张三需要使用到某一个图片，那么就会先到最近的边缘节点查找，如果附近地区之前有叫李四的用户访问过这张图片，那么这张图片就会缓存在这两者最近的边缘节点，那么就可以直接在边缘节点把这张图片返回给李四；如果在边缘节点没找到，那么就回去父节点，父节点没有，就会去源节点查找。在源节点找到，就会传给父节点，父节点会备份一份，然后传给边缘节点，边缘节点再备份，最后返回给用户
 
-![](/imgs/img30.png)
+ ![](/imgs/img30.png)
 
 一般在开发中，使用 CDN 主要是两种方式
 
-- 打包的所有静态资源，放到 CDN 服 
+- 打包的所有静态资源，放到 CDN 服 务器，用户所有资源都是通过 CDN 服务器加载的
 
-  务器，用户所有资源都是通过 CDN 服务器加 
+- 一些第三方资源放到 CDN 服务器上
 
-  载的
 
-- 一些第三方资源放到CDN服务器上
 
 **静态资源放到 CDN 服务器：**
 
@@ -2646,6 +2799,8 @@ CDN：内容分发网络，指通过相互连接的网络系统，利用最靠�
       }
   }
   ```
+
+
 
 **webpack 中第三方资源使用 CDN 的方法：**
 
@@ -2674,7 +2829,7 @@ plugins: [
 
 **方法2：直接使用外部扩展 externals**
 
-外部扩展 externals 的作用：**防止**将某些 `import` 的包(package) **打包**到 bundle 中，而是在运行时(runtime)再去从外部获取这些*扩展依赖(external dependencies)*
+外部扩展 externals 的作用：**防止**将某些 `import` 的包(package) **打包**到 bundle 中，而是在运行时(runtime)再去从外部获取这些扩展依赖(external dependencies)
 
 首先在 index.html 中引入：
 
@@ -2702,7 +2857,9 @@ module.exports = {
 <% } %>
 ```
 
-#### h、http 压缩
+
+
+#### h、gzip 压缩
 
 http 压缩是指在服务器和浏览器间传输压缩文本内容的方法。http 压缩通常采用 gzip 压缩算法压缩html、js、css 等文件。压缩的最大好处就是降低了网络传输的数据量，从而提高客户端浏览器的访问速度。当然，同时也会增加一点服务器的负担
 
@@ -2712,7 +2869,7 @@ http 压缩是指在服务器和浏览器间传输压缩文本内容的方法。
 
 - 兼容的浏览器在向服务器发送请求时，会告知服务器自己支持哪些压缩格式
 
-  ![](/imgs/img32.png)
+   ![](/imgs/img32.png)
 
 - 服务器在浏览器支持的压缩格式下，直接返回对应的压缩后的文件(index.js.gz)，然后浏览器会自动对 gz 文件进行解压，生成 js 文件
 
@@ -2721,6 +2878,8 @@ http 压缩是指在服务器和浏览器间传输压缩文本内容的方法。
 - gzip – GNU zip格式（定义于RFC 1952），是目前使用比较广泛的压缩算法
 - deflate – 基于deflate算法（定义于RFC 1951）的压缩，使用zlib数据格式封装
 - br – 一种新的开源压缩算法，专为HTTP内容的编码而设计（目前兼容性没有上面两个好）
+
+
 
 **在 webpack 中实现 http 压缩：**
 
@@ -2734,7 +2893,7 @@ npm install compression-webpack-plugin -D
 
 使用：
 
-> webpack 4 版本只能使用 compression-webpack-plugin 5.0.1 版本一下的，compression-webpack-plugin 5.0.1一下的会跟 CleanWebpackPlugin 冲突
+> webpack 4 版本只能使用 compression-webpack-plugin 5.0.1 版本以下的，compression-webpack-plugin 5.0.1一下的会跟 CleanWebpackPlugin 冲突
 
 ```js
 plugins: [
@@ -2752,6 +2911,8 @@ plugins: [
 
 # 优化体验和打包分析
 
+
+
 #### 1、打包构建显示进度条
 
 ```
@@ -2760,7 +2921,9 @@ package.json 启动命令行加 --progress
 "build": "webpack --mode production --progress",
 ```
 
-#### 2、分析打包各个模块使用时间
+
+
+#### 2、分析打包各个模块所需时间
 
 如果希望看到每一个 loader、plugins 消耗的打包时间，可以利用插件：speed-measure-webpack-plugin
 
@@ -2785,7 +2948,9 @@ const webpackConfig = (env, options) => {
 module.exports = smp.wrap(webpackConfig)
 ```
 
-![](/imgs/img34.png)
+ ![](/imgs/img34.png)
+
+
 
 #### 3、配置不同环境
 
@@ -2810,6 +2975,8 @@ npm install cross-env -D
 ```js
 process.env.NODE_ENV
 ```
+
+
 
 #### 4、分析打包大小
 
@@ -2857,6 +3024,8 @@ plugins: [
 
 # webpack 拓展
 
+
+
 ### 1、封装 Library
 
 利用 webpack 打包一个我们自己的库文件
@@ -2901,7 +3070,7 @@ umd：指打包出来的东西既支持 amd，又支持 CommonJs，也支持浏�
 
 分析打包后的代码，通过 umd 支持不同模块化：
 
-![](/imgs/img33.png)
+ ![](/imgs/img33.png)
 
 globalObject: 'this' 这里的 this 设置的就是上面图片中自执行函数的 this
 
@@ -2921,7 +3090,7 @@ Loader是一个具有单一职责的转换器
 
 
 
-loader 本质上是一个到处为函数的 javascript  模块，在编译过程中，loader-runner 这个库会调用这个 loader 函数，然后将上一个 loader 产生的结果或者资源文件传进去
+loader 本质上是一个导出为函数的 javascript  模块，在编译过程中，loader-runner 这个库会调用这个 loader 函数，然后将上一个 loader 产生的结果或者资源文件传进去
 
 ```js
 module.exports = function(content, sourcemap, meta) {
@@ -3052,7 +3221,7 @@ module.exports = {
 
 那么控制台会输出：
 
-![](/imgs/img38.png)
+ ![](/imgs/img38.png)
 
 为什么会这样呢？首先，在 webpack 中，loader 会交给 runLoaders 这个函数处理，而这个函数来自于 loader-runner 这个第三方包，来看看 runLoaders 的处理逻辑：
 
@@ -3097,11 +3266,11 @@ function iteratePitchingLoaders(options, loaderContext, callback) {
 
 可以看到，runLoaders 最后实际上就是调用 iteratePitchingLoaders 这个函数，这个函数主要就是迭代 loader，找到 pitch 阶段执行，但是还做了一件事，就是通过 loaderContext.loaderIndex++。最后，再迭代 loader 执行 normal 阶段是利用 loaderContext.loaderIndex--。所以这就是 pitch 是顺序执行，normal 是逆序执行，而 loader 对源文件进行转译的阶段是 normal 阶段，所以才有自右向左，从下往上的执行顺序。
 
-![](/imgs/img39.png)
+ ![](/imgs/img39.png)
 
 
 
-**修改loader执行顺序：**
+**修改 loader 执行顺序：**
 
 首先，目前 loader 有四类：
 
@@ -3160,7 +3329,7 @@ import 'loader1!loader2!./test.js'
 
 **同步与异步 loader**
 
-首先，必须要明确的是，loader 函数必须要返回值，不然会报错。而且是在 loader 函数执行完之后就要返回值，那么就会存在问题，比如 loader 里面有异步的操作，那么异步操作会进入到异步队列，把返回放在异步操作里面，就不符合 loader 函数执行完之后就要返回值的设定，一样会报错。所以就有了异步 loader 的概念。
+首先，必须要明确的是，loader 函数必须要有返回值，不然会报错。而且是在 loader 函数执行完之后就要返回值，那么就会存在问题，比如 loader 里面有异步的操作，那么异步操作会进入到异步队列，把返回放在异步操作里面，就不符合 loader 函数执行完之后就要返回值的设定，一样会报错。所以就有了异步 loader 的概念。
 
 先看同步 loader，同步 loader 返回有两种方式：
 
@@ -3577,7 +3746,6 @@ class UploadAssetPlugin {
 }
 
 module.exports = UploadAssetPlugin
-
 ```
 
 
@@ -3594,11 +3762,15 @@ https://juejin.cn/post/6844904162405138445
 
 ![](/imgs/img37.png)
 
+
+
 ### 1、从 npm run build 开始
 
 首先，npm run build 是执行的 `"build": "webpack --mode production --progress" 这一行代码，相当于执行 npx webpack
 
 npx webpack 主要就是去到 node_modules 下面的 .bin 目录找到 webpack 文件，然后执行
+
+
 
 ### 2、node_modules/.bin/webpack
 
@@ -3617,6 +3789,8 @@ exit $ret
 ```
 
 可以看出，就是通过 shell 命令去执行 node_modules/webpack/bin/webpack.js 文件
+
+
 
 ### 3、node_modules/webpack/bin/webpack.js 文件
 
@@ -3723,6 +3897,8 @@ if (!cli.installed) {
 
 > 我们在使用 webpack 通过 npm 下载包的时候，一般是会 webpack 跟 webpack-cli 一起下载的，所以基本就是直接走到了 runCli(cli) 这一步
 
+
+
 ### 4、node_modules/webpack-cli/bin/cli.js
 
 这个的逻辑其实也很简单，就是如果没有下载 webpack，就发出警告，并且通过提问的方式询问是否需要下载 webpack。
@@ -3759,6 +3935,8 @@ if (utils.packageExists('webpack')) {
 
 这一步的最终结果就是执行 runCLI，这个函数由 webpack-cli/lib/bootstrap.js 得到
 
+
+
 ### 5、runCLI 函数
 
 runCLI 函数由 webpack-cli/lib/bootstrap.js 得到，主要作用：就是创建一个 WebpackCLI 类实例，然后执行这个实例里面的 run 方法
@@ -3778,6 +3956,8 @@ const runCLI = async (args, originalModuleCompile) => {
     }
 };
 ```
+
+
 
 ### 6、new WebpackCLI()
 
@@ -3927,7 +4107,7 @@ class WebpackCLI {
 
 ### 8、结论
 
-在 webpack 中，启动 webpack 借助于 webpack-cli，webpack-cli 主要做的事就是：对 webpack.config.js 以及 package.json 中于与 webpack 相关的配置参数做处理、合并等等一些前置操作，其实最核心的就是下面这一段，执行 wbepack 函数
+在 webpack 中，启动 webpack 借助于 webpack-cli，webpack-cli 主要做的事就是：对 webpack.config.js 以及 package.json 中与 webpack 相关的配置参数做处理、合并等等一些前置操作，其实最核心的就是下面这一段，执行 wbepack 函数
 
 ```js
 compiler = this.webpack(
