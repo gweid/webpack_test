@@ -866,15 +866,42 @@ if (module.hot) {
 
 HMR 基本原理：
 
-![](/imgs/img19.png)
+![](/imgs/img41.png)
 
-- webpack-dev-server 会创建两个服务
-  - express 提供静态资源服务，打包后的资源直接被浏览器请求和解析
-  - socket 长连接服务
-- socket 长连接服务
-  - 当服务器监听到对应的模块发生变化时，会生成两个文件.json（manifest文件）和.js文件（update chunk）
-  - 通过 socket 直接将这两个文件主动发送给客户端（浏览器）
-  - 浏览器拿到两个新的文件后，通过HMR runtime机制，加载这两个文件，并且针对修改的模块进行更新
+右侧`Server`端使用`webpack-dev-server`去启动本地服务，内部实现主要使用了`webpack`、`express`、`websocket`
+
+- 使用`express`启动本地服务，当浏览器访问资源时对此做响应。
+
+- 服务端和客户端使用`websocket`实现长连接
+
+- `webpack`监听源文件的变化，即当开发者保存文件时触发`webpack`的重新编译
+
+  - 每次编译都会生成`hash值`、`已改动模块的json文件`、`已改动模块代码的js文件`
+  - 编译完成后通过`socket`向客户端推送当前编译的`hash戳`
+
+- 客户端的`websocket`监听到有文件改动推送过来的`hash戳`，会和上一次对比
+
+  - 会先判断是浏览器刷新还是模块热更新，如果是浏览器刷新，那么直接刷新，不会有后续
+
+  - 如果是热更新，会判断 hash 是否一致，一致则走缓存
+
+  - 不一致则通过`ajax`和`jsonp`向服务端获取最新资源，会得到两个文件 .json（manifest文件）和 .js 文件（update chunk）
+
+- 浏览器拿到两个新的文件后，通过 HMR runtime 机制，加载这两个文件，并且针对修改的模块进行更新；分三步：
+
+  - 找出过期模块 `outdatedModules` 和过期依赖 `outdatedDependencies` ；
+  - 从缓存中删除过期模块、依赖和所有子元素的引用；
+  - 将新模块代码添加到 modules 中，当下次调用 `__webpack_require__` (webpack 重写的 `require` 方法)方法的时候，就是获取到了新的模块代码了。
+
+- 现在新代码已经替换旧代码，但是业务代码并不知道这些变化，因此需要通过 `accept`事件通知应用层使用新的模块进行“局部刷新”：
+
+  ```js
+  if (module.hot) {
+    module.hot.accept('./library.js', function() {
+      // 使用更新过的 library 模块执行某些操作...
+    })
+  }
+  ```
 
 
 
@@ -2039,7 +2066,9 @@ resolve 常用的属性：
 
 ### 1、优化构建速度
 
-#### HMR hot module replacement 热模块替换 作用：只对有变动的模块进行重新打包更新
+#### HMR hot module replacement 热模块替换
+
+作用：只对有变动的模块进行重新打包更新
 
 ```
 // !!!!!!!!!! 注意：使用 MiniCssExtractPlugin 抽离的 css 对热替换没用， 一般开发环境不抽离 css，使用热替换；生产环境抽离 css !!!!!!!!!!
