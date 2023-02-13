@@ -2689,6 +2689,10 @@ module.exports = {
 
 
 
+更详细的 splitChunks 学习，查看：[SplitChunks学习](./SplitChunks学习.md)
+
+
+
 **动态导入(dynamic import)：**
 
 通过动态导入的方式也可以进行代码分离，webpack 对于异步导入的代码都会进行单独的打包
